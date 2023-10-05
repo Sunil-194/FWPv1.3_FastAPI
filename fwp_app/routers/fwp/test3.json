@@ -1,0 +1,1016 @@
+{
+    "meta": {
+      "name": "SUNIL GAJANAN SAKHARAM BHAVE",
+      "date": "2023-06-20",
+      "mobile_number": "8657319157"
+    },
+    "money_sign": {
+      "money_sign": "Vigilant Turtle",
+      "money_sign_desc": "You’re an incredibly composed and grounded individual with a strong sense of self-control, which comes from being satisfied with your achievements. You firmly believe in working hard to achieve your goals and follow a very systematic and disciplined approach while solving problems across different facets of your life. You dislike uncertainty because it leaves you feeling anxious, and you’re apprehensive about deviating from tried-and-tested conventions as you believe it exposes you to unwanted risks.\n\n You’re extremely skilled at negotiating difficult situations by applying a watertight system of checks and balances that you’ve established over time. You’re careful and highly observant, which allows you to anticipate undesirable outcomes and prepare in advance. You believe in taking one step at a time, and that holds you in good stead.",
+      "money_sign_behavioural_bias": [
+        {
+          "title": "Status Quo Bias",
+          "desc": "You aren’t keen to make changes to your life unless absolutely necessary, and would rather choose options that require minimal effort. This restricts you from exploring more beneficial opportunities. This bias could lead to you sticking to financial instruments that do not align with your financial traits and/or goals, because you’re not considering better options."
+        },
+        {
+          "title": "Endowment Bias",
+          "desc": "You’re prone to placing a higher value on an inherited or purchased asset than its fair market value. Consequently, you might hold on to such assets even if the future prospects are not very positive. Because of this bias, you may continue to stick with assets that you’re familiar with instead of scouting for better opportunities, which would result in an unsuitable asset allocation."
+        },
+        {
+          "title": "Regret-Aversion Bias",
+          "desc": "You worry about incurring losses that arise from independent decision-making, which can either result in a preference for inaction to avoid the sting of regret, or transpire into exhibiting herd behaviour. This bias can cause you to become too conservative in your approach and to default to low-risk or popular financial instruments, which may not be the best choice for achieving your long-term milestones."
+        }
+      ]
+    },
+    "gen_profile": {
+      "gen_profile": "Generation 2",
+      "gen_profile_desc": "Skilled professional with a steady income and cautious outlook, who wants to improve the standard of living",
+      "life_stage": "Building phase",
+      "life_stage_age_range": "26 - 35",
+      "life_stage_desc": [
+        "Growing professional skills and expertise",
+        "Building financial stability",
+        "Taking on more responsibilities",
+        "Focusing on building a strong foundation"
+      ]
+    },
+    "oneview": {
+      "fbs": 48,
+      "assets": [
+        {
+          "title": "Equity",
+          "value": "0"
+        },
+        {
+          "title": "Real Estate",
+          "value": "8500000.00"
+        },
+        {
+          "title": "Debt",
+          "value": "550000.00"
+        },
+        {
+          "title": "Alternative Investment",
+          "value": "500000.00"
+        },
+        {
+          "title": "Passive Income Assets",
+          "value": "0"
+        }
+      ],
+      "liabilities": [
+        {
+          "title": "Good Liabilities",
+          "value": "7200000.00"
+        },
+        {
+          "title": "Bad Liabilities",
+          "value": "354000.00"
+        }
+      ],
+      "insurance": [
+        {
+          "title": "Life Insurance",
+          "value": "0"
+        },
+        {
+          "title": "Health Insurance",
+          "value": "6000000"
+        }
+      ],
+      "income": [
+        {
+          "title": "Regular Income",
+          "value": "1600000"
+        },
+        {
+          "title": "Other Income",
+          "value": "0"
+        }
+      ],
+      "expense": [
+        {
+          "title": "Household + Lifestyle",
+          "value": "360000"
+        },
+        {
+          "title": "Taxes",
+          "value": "179400.00"
+        }
+      ],
+      "total": {
+        "assets": "9550000.00",
+        "liabilities": "7554000.00",
+        "income": "1600000",
+        "expense": "539400",
+        "insurance": "6000000"
+      }
+    },
+    "assets": {
+      "total": {
+        "market_value": "9550000.00",
+        "monthly_investments": "5200.00"
+      },
+      "table": [
+        {
+          "asset": "Occupied Home",
+          "percentage": "89.01",
+          "asset_class": "Real Estate",
+          "market_value": "8500000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Physical Gold",
+          "percentage": "5.24",
+          "asset_class": "Alternative Investment",
+          "market_value": "500000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Savings",
+          "percentage": "4.19",
+          "asset_class": "Debt",
+          "market_value": "400000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Physical Gold",
+          "percentage": "5.24",
+          "asset_class": "Alternative Investment",
+          "market_value": "500000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Savings",
+          "percentage": "4.19",
+          "asset_class": "Debt",
+          "market_value": "400000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Physical Gold",
+          "percentage": "5.24",
+          "asset_class": "Alternative Investment",
+          "market_value": "500000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Savings",
+          "percentage": "4.19",
+          "asset_class": "Debt",
+          "market_value": "400000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Physical Gold",
+          "percentage": "5.24",
+          "asset_class": "Alternative Investment",
+          "market_value": "500000.00",
+          "monthly_investments": "0.00"
+        },
+        {
+          "asset": "Savings",
+          "percentage": "4.19",
+          "asset_class": "Debt",
+          "market_value": "400000.00",
+          "monthly_investments": "0.00"
+        },
+        
+        {
+          "asset": "EPF",
+          "percentage": "1.57",
+          "asset_class": "Debt",
+          "market_value": "150000.00",
+          "monthly_investments": "5200.00"
+        }
+      ],
+      "pie": [
+        {
+          "particular": "Equity",
+          "percentage": 0
+        },
+        {
+          "particular": "Real Estate",
+          "percentage": 89
+        },
+        {
+          "particular": "Passive Income",
+          "percentage": 0
+        },
+        {
+          "particular": "Debt",
+          "percentage": 6
+        },
+        {
+          "particular": "Alternative Investment",
+          "percentage": 5
+        }
+      ]
+    },
+    "liabilities": {
+      "total": "7554000.00",
+      "table": [
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+        {
+          "liability": "Housing Loan",
+          "account_age_in_months": 12,
+          "pending_months": 288.00,
+          "interest_rate": 8.15000,
+          "liability_category": "Good",
+          "outstanding_amount": "7200000.00",
+          "emi": "57000.00"
+        },
+  
+        {
+          "liability": "Personal Loan",
+          "account_age_in_months": 12,
+          "pending_months": 108.00,
+          "interest_rate": 11.62000,
+          "liability_category": "Bad",
+          "outstanding_amount": "354000.00",
+          "emi": "5300.00"
+        }
+      ],
+      "pie": [
+        {
+          "particular": "Good liabilities",
+          "percentage": 95
+        },
+        {
+          "particular": "Bad liabilities",
+          "percentage": 5
+        }
+      ]
+    },
+    "emergency": {
+      "emergency_funds": {
+        "title": "Emergency Funds",
+        "total": "400000",
+        "ideal_range": "275175 - 917250",
+        "comment": "Having an adequate liquidity buffer is an excellent downside protection strategy against situations like job loss, financial emergencies, etc.",
+        "color": "green"
+      },
+      "health_insurance": {
+        "title": "Health Insurance",
+        "total": "6000000",
+        "ideal_range": "600000 - 1000000",
+        "comment": "Purchasing a high level of health insurance may be a personal preference, but it does come with a high premium cost.",
+        "color": "green"
+      },
+      "life_insurance": {
+        "title": "Life Insurance",
+        "total": "0",
+        "ideal_range": "6000000 - 10000000",
+        "comment": "Inadequate life cover can be damaging for dependants if the policy owner leaves behind a large amount of liabilities, with only a few assets.",
+        "color": "red"
+      }
+    },
+    "ratios": {
+      "good_liabilities_to_total_assets": {
+        "title": "Good Liabilities-to-Total Assets",
+        "total": "0.7539",
+        "ideal_range": "16.78% - 41.95%",
+        "comment": "Going overboard with liabilities defeats the purpose of taking them on, especially if returns on your asset portfolio are low.",
+        "color": "red"
+      },
+      "bad_liabilities_to_total_assets": {
+        "title": "Bad Liabilities-to-Total Assets",
+        "total": "0.0371",
+        "ideal_range": "0% - 3.73%",
+        "comment": "It is critical to keep unsecured or high-cost debt under control because, in comparison, a majority of assets yield lower returns.",
+        "color": "green"
+      },
+      "expense_to_income": {
+        "title": "Expense-to-Income",
+        "total": "0.3371",
+        "ideal_range": "0% - 44.16%",
+        "comment": "Keeping expenses under control reduces the likelihood of encountering a cash flow problem.",
+        "color": "green"
+      },
+      "good_liabilities_linked_emi_to_income": {
+        "title": "Good Liability Linked EMI-to-Income",
+        "total": "0.4275",
+        "ideal_range": "11.35% - 28.36%",
+        "comment": "Maintaining a high debt burden to save on debt interest may be counterproductive because it can result in liquidity problems.",
+        "color": "red"
+      },
+      "bad_liabilities_linked_emi_to_income": {
+        "title": "Bad Liability Linked EMI-to-Income",
+        "total": "0.0398",
+        "ideal_range": "0% - 12.47%",
+        "comment": "It is critical to manage bad debt repayment well in order to avoid paying too much interest on high-cost liabilities.",
+        "color": "green"
+      },
+      "investments_to_income": {
+        "title": "Investments-to-Income",
+        "total": "0.0390",
+        "ideal_range": "20.68% - 51.7%",
+        "comment": "Inconsistent savings, owing to an inability to delay gratification, leave you financially vulnerable.",
+        "color": "red"
+      }
+    },
+    "asset_allocation": {
+      "equity": {
+        "title": "Equity",
+        "total": "0",
+        "ideal_range": "26.84% - 67.89%",
+        "comment": "Keeping equity allocation low could potentially limit the long-term growth potential of a portfolio and may result in lower returns.",
+        "color": "red"
+      },
+      "real_estate": {
+        "title": "Real Estate",
+        "total": "0.8901",
+        "ideal_range": "34.31% - 59.31%",
+        "comment": "Overexposure to the real estate market may lead to portfolio concentration, a lack of diversification, and limited liquidity and flexibility.",
+        "color": "red"
+      },
+      "passive_income_assets": {
+        "title": "Passive Income Assets",
+        "total": "0",
+        "ideal_range": "3.2% - 29.8%",
+        "comment": "Keeping very low or no passive income assets may limit one's ability to generate consistent and reliable streams of income in the long term and increase vulnerability to financial risks.",
+        "color": "red"
+      },
+      "debt": {
+        "title": "Debt",
+        "total": "0.0576",
+        "ideal_range": "5.42% - 30.42%",
+        "comment": "Maintaining an adequate debt allocation in the portfolio could reduce volatility and serve as a fallback mechanism during times of economic uncertainty.",
+        "color": "green"
+      },
+      "alternative_investments": {
+        "title": "Alternative Investments",
+        "total": "0.0524",
+        "ideal_range": "0% - 28.63%",
+        "comment": "Allocating some portion of the portfolio to alternative products provides diversification benefits.",
+        "color": "green"
+      }
+    },
+    "networth": {
+      "networth": "1996000",
+      "assets": "9550000",
+      "liabilities": "7554000",
+      "networth_projection": {
+        "table": [
+          {
+            "year": 2023,
+            "cnwt": 0.96,
+            "nwtet": 0.96
+          },
+          {
+            "year": 2024,
+            "cnwt": 1.5,
+            "nwtet": 1.01
+          },
+          {
+            "year": 2025,
+            "cnwt": 1.6,
+            "nwtet": 1.13
+          },
+          {
+            "year": 2026,
+            "cnwt": 1.21,
+            "nwtet": 1.26
+          },
+          {
+            "year": 2027,
+            "cnwt": 1.32,
+            "nwtet": 1.41
+          },
+          {
+            "year": 2028,
+            "cnwt": 1.42,
+            "nwtet": 1.59
+          },
+          {
+            "year": 2029,
+            "cnwt": 1.54,
+            "nwtet": 1.78
+          },
+          {
+            "year": 2030,
+            "cnwt": 1.67,
+            "nwtet": 2.01
+          },
+          {
+            "year": 2031,
+            "cnwt": 1.80,
+            "nwtet": 2.27
+          },
+          {
+            "year": 2032,
+            "cnwt": 1.95,
+            "nwtet": 2.57
+          },
+          {
+            "year": 2033,
+            "cnwt": 2.11,
+            "nwtet": 2.92
+          },
+          {
+            "year": 2034,
+            "cnwt": 2.28,
+            "nwtet": 3.44
+          },
+          {
+            "year": 2035,
+            "cnwt": 2.46,
+            "nwtet": 4.00
+          },
+          {
+            "year": 2036,
+            "cnwt": 2.66,
+            "nwtet": 4.63
+          },
+          {
+            "year": 2037,
+            "cnwt": 2.88,
+            "nwtet": 5.32
+          },
+          {
+            "year": 2038,
+            "cnwt": 3.11,
+            "nwtet": 6.08
+          },
+          {
+            "year": 2039,
+            "cnwt": 3.36,
+            "nwtet": 6.91
+          },
+          {
+            "year": 2040,
+            "cnwt": 3.63,
+            "nwtet": 7.83
+          },
+          {
+            "year": 2041,
+            "cnwt": 3.92,
+            "nwtet": 8.83
+          },
+          {
+            "year": 2042,
+            "cnwt": 4.23,
+            "nwtet": 9.93
+          },
+          {
+            "year": 2043,
+            "cnwt": 4.57,
+            "nwtet": 11.13
+          },
+          {
+            "year": 2044,
+            "cnwt": 4.93,
+            "nwtet": 12.69
+          },
+          {
+            "year": 2045,
+            "cnwt": 5.33,
+            "nwtet": 14.27
+          },
+          {
+            "year": 2046,
+            "cnwt": 5.75,
+            "nwtet": 15.89
+          },
+          {
+            "year": 2047,
+            "cnwt": 6.21,
+            "nwtet": 17.58
+          },
+          {
+            "year": 2048,
+            "cnwt": 6.71,
+            "nwtet": 19.34
+          }
+        ],
+        "retirement_month_year": "March 2048",
+        "retirement_cnwt": 1996000.00000,
+        "retirement_nwtet": 1996000.00000
+      },
+      "value_under_advisory": "17104000"
+    },
+    "bureau_report_summary": {
+      "credit_score_analysis": {
+        "score": "670",
+        "our_evaluation": "650-750",
+        "commentary": "You have a good credit score and will be regarded as a good customer, though a score higher than 750 is better."
+      },
+      "credit_facilities_taken": [
+        {
+          "type_of_facility": "Other Loan",
+          "total_records": 0,
+          "active_accounts": 0,
+          "closed_accounts": 0,
+          "accounts_with_negative_history": 0
+        },
+        {
+          "type_of_facility": "Gold Loan",
+          "total_records": 0,
+          "active_accounts": 0,
+          "closed_accounts": 0,
+          "accounts_with_negative_history": 0
+        },
+        {
+          "type_of_facility": "Housing Loan",
+          "total_records": 1,
+          "active_accounts": 1,
+          "closed_accounts": 0,
+          "accounts_with_negative_history": 0
+        },
+        {
+          "type_of_facility": "Auto Loan",
+          "total_records": 0,
+          "active_accounts": 0,
+          "closed_accounts": 0,
+          "accounts_with_negative_history": 0
+        },
+        {
+          "type_of_facility": "Personal Loan",
+          "total_records": 1,
+          "active_accounts": 1,
+          "closed_accounts": 0,
+          "accounts_with_negative_history": 0
+        },
+        {
+          "type_of_facility": "Credit Card Loan",
+          "total_records": 0,
+          "active_accounts": 0,
+          "closed_accounts": 0,
+          "accounts_with_negative_history": 0
+        }
+      ]
+    },
+    "liability_management": {
+      "table": [
+        {
+          "liability_type": "Good",
+          "current_liability_distribution_outstanding_percentage": "95.31",
+          "current_liability_distribution_emi_percentage": "91.49",
+          "suggested_loan_size_range": "1524326 to 3808801",
+          "suggested_emi_range": "15133 to 37813"
+        },
+        {
+          "liability_type": "Bad",
+          "current_liability_distribution_outstanding_percentage": "4.69",
+          "current_liability_distribution_emi_percentage": "8.51",
+          "suggested_loan_size_range": "0 to 356215",
+          "suggested_emi_range": "0 to 8025"
+        }
+      ],
+      "total": {
+        "liability_type": "Total",
+        "current_liability_distribution_outstanding_percentage": "7554000.00",
+        "current_liability_distribution_emi_percentage": "62300.0000",
+        "suggested_loan_size_range": "1524326.1022 to 4165015.7325",
+        "suggested_emi_range": "15133.3333 to 45838.7647"
+      },
+      "comments": [
+        "Your EMI Burden Ratio (EMI by gross monthly income) is high at 47%.",
+        "Consider bringing down your liabilities and EMI to our suggested range."
+      ]
+    },
+    "mf_holding_evaluation": {
+      "table": [],
+      "total": {
+        "current_value": "",
+        "fund_evaluation_score": 0,
+        "excess_annual_commission": ""
+      },
+      "comments1": [],
+      "comments2": []
+    },
+    "fwp": [
+      {
+        "title": "Asset Allocation",
+        "desc": [
+
+        ]
+      },
+      {
+        "title": "Expense and Liability Management",
+        "desc": [
+ 
+        ]
+      },
+      {
+        "title": "Emergency Planning",
+        "desc": [
+
+        ]
+      }
+    ],
+    "next_three_months_action_plan": {
+      "table": [
+        {
+          "particular": "Income",
+          "amount": "400000"
+        },
+        {
+          "particular": "Household & Lifestyle Expenses",
+          "amount": "90000"
+        },
+        {
+          "particular": "Tax Expenses",
+          "amount": "44850.00"
+        },
+        {
+          "particular": "EMIs",
+          "amount": "186900.00"
+        },
+        {
+          "particular": "Planned Investments",
+          "amount": "15600"
+        },
+        {
+          "particular": "Surplus for the Period",
+          "amount": "62650"
+        }
+      ],
+      "comments": [
+        {
+          "title": "Asset Allocation",
+          "desc": [
+          ]
+        },
+        {
+          "title": "Emergency Planning",
+          "desc": [
+          ]
+        },
+        {
+          "title": "Expense and Liability Management",
+          "desc": [
+          ]
+        }
+      ]
+    },
+    "featured_list": {
+      "term_insurance": {
+        "table": [
+          {
+            "insurer": "Hdfc Life",
+            "plan": "Hdfc Life Click 2 protect Life",
+            "pros": [
+              "Claim Settlement Ratio (CSR) of 98.66%",
+              "Flexibility to change premium payment terms from regular to limited pay",
+              "Change of payment frequency during premium paying term available at no cost",
+              "Good track record of settling claims faster than other insurers",
+              "3 complaints per 10000 claims"
+            ],
+            "cons": [
+              "Expensive than other competing products"
+            ]
+          },
+          {
+            "insurer": "Max Life",
+            "plan": "Max Life Smart Secure Plus",
+            "pros": [
+              "Claim Settlement ratio of 99.34%",
+              "Slightly less expensive than competing products on the market",
+              "Terminal illness coverage at no cost",
+              "Coverage of 64 Critical illness, which is a separate cover in addition to base cover amount"
+            ],
+            "cons": [
+              "There are few options for customising claim payouts"
+            ]
+          },
+          {
+            "insurer": "TATA-AIA Life",
+            "plan": "Sampoorna Raksha Supreme",
+            "pros": [
+              "Claim settlement ratio of 98.53%",
+              "In-built terminal illness cover",
+              "Option to increase coverage at key life stages"
+            ],
+            "cons": [
+              "No discount on online purchase of policy"
+            ]
+          }
+        ]
+      },
+      "health_insurance": {
+        "table": [
+          {
+            "insurer": "Manipal Cigna",
+            "plan": "ProHealth Prime Protect",
+            "pros": [
+              "No room rent sublimits",
+              "No Claim Bonus (NCB) benefit is greater than 150% over time",
+              "Sum insured can be recharged up to the cover amount for related diseases",
+              "No co-pay in the policy",
+              "Rewards for healthy behaviour are available"
+            ],
+            "cons": [
+              "6500 Cashless Network Hospitals",""
+            ]
+          },
+          {
+            "insurer": "Niva Bupa Health",
+            "plan": "Health ReAssure",
+            "pros": [
+              "No room rent sublimits",
+              "No Claim Bonus (NCB) benefit over time is up to 100%",
+              "Sum insured can be recharged up to the cover amount for related diseases",
+              "No co-pay in the policy",
+              "Rewards for healthy behaviour are available",
+              "8600 cashless network hospitals"
+            ],
+            "cons": [
+              "Pre-existing diseases are covered after 3 years"
+            ]
+          },
+          {
+            "insurer": "Care Health",
+            "plan": "Care Plus",
+            "pros": [
+              "No room rent sublimits",
+              "No Claim Bonus (NCB) benefit is greater than 150% over time",
+              "Recharge of sum insured upto the cover amount is available for an unlimited number of times for unrelated diseases",
+              "No co-pay in the policy",
+              "Rewards for healthy behaviour are available",
+              "There are 19000 cashless network hospitals, which is the most of any insurer"
+            ],
+            "cons": [
+              "Pre-existing diseases are covered after 3 years"
+            ]
+          },
+          {
+            "insurer": "Aditya Birla Health",
+            "plan": "Activ Health Platinum Enhanced",
+            "pros": [
+              "No room rent sublimits",
+              "No Claim Bonus (NCB) benefit can be up to 100% over time",
+              "No co-pay in the policy",
+              "Rewards for healthy behaviour are available",
+              "10,051 cashless network hospitals",
+              "Sum insured can be recharged once per policy year up to the cover amount"
+            ],
+            "cons": [
+              "Pre-existing diseases are covered after 3 years"
+            ]
+          },
+          {
+            "insurer": "Navi General",
+            "plan": "Navi Health Plan 5",
+            "pros": [
+              "No Claim Bonus (NCB) benefit is greater than 150% over time",
+              "Recharge of sum insured upto the cover amount is available for an unlimited number of times for unrelated diseases",
+              "Pre-existing diseases are covered after 1 year",
+              "No co-pay in the policy",
+              "Rewards for healthy behaviour are available",
+              "10000 Cashless Network Hospitals"
+            ],
+            "cons": [
+              "Low Claim Settlement Ratio (CSR) of 83%"
+            ]
+          }
+        ]
+      },
+      "equity_mutual_funds": {
+        "table": [
+          {
+            "category": "Large Cap Index",
+            "fund_scheme": "HDFC Index Fund-S&P BSE Sensex",
+            "one_finance_score": 96,
+            "strengths": [
+              "Accurate tracking of performance of underlying benchmark index with minimal deviation",
+              "Large AUM of ₹ 4156 cr","",""
+            ],
+            "weakness": []
+          },
+          {
+            "category": "Large Cap Index",
+            "fund_scheme": "Navi Nifty 50 Index Fund",
+            " ": 90,
+            "strengths": [
+              "Accurate tracking of performance of underlying benchmark index with minimal deviation",
+              "Low expense ratio of 0.06% as compared with category average of 0.22%."
+            ],
+            "weakness": [
+              "Only 1 year of track record",
+              "Small AUM of ₹ 96 cr"
+            ]
+          },
+          {
+            "category": "Large Cap Index",
+            "fund_scheme": "Axis Nifty 50 Index Fund",
+            "one_finance_score": 90,
+            "strengths": [
+              "Accurate tracking of performance of underlying benchmark index with minimal deviation",
+              "Low expense ratio of 0.12% as compared with category average of 0.22%."
+            ],
+            "weakness": [
+              "Only 1 year of track record"
+            ]
+          },
+          {
+            "category": "Flexicap Fund",
+            "fund_scheme": "Parag Parekh Flexi Cap Fund",
+            "one_finance_score": 99,
+            "strengths": [
+              "Consistency in delivering high risk-adjusted returns by actively managing funds between large cap, midcap and smallcap",
+              "Strong ability to outperform benchmark returns"
+            ],
+            "weakness": []
+          },
+          {
+            "category": "Flexicap Fund",
+            "fund_scheme": "Kotak Flexi Cap Fund",
+            "one_finance_score": 97,
+            "strengths": [
+              "Consistency in delivering high risk-adjusted returns by actively managing funds between large cap, midcap and smallcap",
+              "Low expense ratio of 0.67% versus category average of 0.84%"
+            ],
+            "weakness": []
+          },
+          {
+            "category": "Flexicap Fund",
+            "fund_scheme": "Franklin India Flexi Cap Fund",
+            "one_finance_score": 94,
+            "strengths": [
+              "Consistency in delivering high risk-adjusted returns by actively managing funds between large cap, midcap and smallcap"
+            ],
+            "weakness": [
+              "High expense ratio of 1.09% versus category average of 0.84%"
+            ]
+          }
+        ]
+      }
+    },
+    "our_assumption": {
+      "assets": [
+        {
+          "asset_class": "Equity",
+          "return_percentage": "10% - 15%",
+          "risk_level": "Moderate to High",
+          "examples": [
+            "Direct equity",
+            "Equity funds",
+            "International/overseas funds"
+          ]
+        },
+        {
+          "asset_class": "Real Estate",
+          "return_percentage": "5% - 10%",
+          "risk_level": "Low to High",
+          "examples": [
+            "Occupied home",
+            "Commercial property",
+            "Land"
+          ]
+        },
+        {
+          "asset_class": "Passive Income Assets",
+          "return_percentage": "7% - 15%",
+          "risk_level": "Low to High",
+          "examples": [
+            "Rental yielding property",
+            "REITs",
+            "InvITs"
+          ]
+        },
+        {
+          "asset_class": "Debt",
+          "return_percentage": "4% - 10%",
+          "risk_level": "Very Low to High",
+          "examples": [
+            "Safe Deposits",
+            "Debt Funds",
+            "EPF/PPF"
+          ]
+        },
+        {
+          "asset_class": "Alternative Investments",
+          "return_percentage": "8% - 30%",
+          "risk_level": "Low to Very High",
+          "examples": [
+            "Gold",
+            "Digital assets",
+            "Art and Collectibles"
+          ]
+        }
+      ],
+      "yoy_growth_to_income": [
+        {
+          "life_stage": "Building",
+          "age_range": "26 - 35",
+          "income_growth": "15%"
+        },
+        {
+          "life_stage": "Growth",
+          "age_range": "36 - 45",
+          "income_growth": "20%"
+        },
+        {
+          "life_stage": "Sustainability",
+          "age_range": "46 - 55",
+          "income_growth": "5%"
+        },
+        {
+          "life_stage": "Pre-Retirement",
+          "age_range": "56 - 60",
+          "income_growth": "-20%"
+        }
+      ],
+      "yoy_growth_expense": "10%",
+      "liabilities_interest_ratio": [
+        {
+          "liabilities": "Housing Loan",
+          "interest_rate_range": "8%-12%"
+        },
+        {
+          "liabilities": "Auto Loan",
+          "interest_rate_range": "8%-12%"
+        },
+        {
+          "liabilities": "Personal Loan",
+          "interest_rate_range": "11%-15%"
+        },
+        {
+          "liabilities": "Education Loan",
+          "interest_rate_range": "8%-12%"
+        }
+      ]
+    }
+  }
