@@ -108,7 +108,6 @@ def task_success_handler(sender=None, result=None,**kwargs):
  
     update_record_in_db(sender.request.id,result.state,result.status)
     ts = str(dt.now())
-    print('\n\n\n\ webhook called ',task_id,state,ts)
     webhook_update(task_id,status)
 
 
@@ -124,5 +123,4 @@ def task_failure_handler(sender=None, result=None,**kwargs):
     
     update_record_in_db(sender.request.id,result.state,result.status,result.traceback)
     ts = str(dt.now())
-    print('\n\n\n\ webhook called ',task_id,state,ts)
     webhook_update(task_id,status,traceback)
