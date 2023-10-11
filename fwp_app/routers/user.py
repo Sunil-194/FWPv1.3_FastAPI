@@ -10,9 +10,10 @@ from celery.result import AsyncResult
 import subprocess
 import requests
 from .. import celery_worker
-
+from celery.contrib.abortable import AbortableTask
 from celery.result import AsyncResult
 from fastapi.encoders import jsonable_encoder
+
 
 router = APIRouter(
     tags=['USER'],
@@ -32,10 +33,9 @@ async def Create_FWP(json_file:UploadFile = File(...),db:Session=Depends(models.
             js_file = await json_file.read()
             json_data = json.loads(js_file)
         else:
-            print('Wrong File2')
             responses.status_code = status.HTTP_406_NOT_ACCEPTABLE
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="Please Insert a Json File")
-        print(len(json_data['document']))
+            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="Please Insert valid a Json File")
+        
         task_response = []
         # for i in range(len(json_data['document'])):
         #     data=json_data['document'][i]
@@ -50,7 +50,8 @@ async def Create_FWP(json_file:UploadFile = File(...),db:Session=Depends(models.
             result = AsyncResult(task.task_id, app=celery_worker.celery)
             task_log(db, task.task_id,user_uuid,user_name,result.state,result.status)
             task_response.append({'task_id':task.task_id,"user_uuid":user_uuid,"user_name":user_name})
-            
+        
+        #//*----A webhook post request to show all the pdf creation passed by user having client FWP data in JSON with their uuid.     
         webhook_url = os.environ.get('WEBHOOK_URL')
         req = {
             "response":task_response,
@@ -66,8 +67,6 @@ async def Create_FWP(json_file:UploadFile = File(...),db:Session=Depends(models.
         responses.status_code = status.HTTP_406_NOT_ACCEPTABLE
         raise HTTPException(status_code=responses.status_code,detail={"Status":"PDF Not Created Please Check Json Data","Error Log":error_log})
     
-    finally:
-        ts = str(dt.now())
         
         
 
@@ -78,6 +77,18 @@ def task_log(db, taskid,user_uuid,user_name,state,status):
     db.commit()
     db.refresh(task_log)
     db.close()
+    
+# @router.post('/abort_tasks',status_code=status.HTTP_201_CREATED)
+# def abort_running_task(**task_data):
+#     # data = json.loads(task_data)
+#     data = json.loads(task_data['task_data'])
+#     for key in data['response']:
+#         task_id = key['task_id']
+        
+        
+#         task = AsyncResult(task_id, app=celery_worker.celery).revoke()
+#         return 'canceled'
+    
 
 
 # @router.post('/webhook_check',status_code=status.HTTP_201_CREATED)

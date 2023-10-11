@@ -1,4 +1,5 @@
 from celery import Celery, signals
+from celery.contrib.abortable import AbortableTask
 from dotenv import load_dotenv
 from celery.result import AsyncResult
 from time import sleep
@@ -42,7 +43,7 @@ class SqlAlchemyTask(celery.Task):
     abstract = True
 
 #//*---Sample FWP genrate job --------------------------------*//
-@celery.task(name = 'create_task',base = SqlAlchemyTask)
+@celery.task(name = 'create_task',base = AbortableTask,default_retry_delay=30, max_retries=6)
 def create_task(data):
     cwd = os.getcwd()
     save_path = os.path.join(cwd,'fwp_app','routers','fwp','Sample')

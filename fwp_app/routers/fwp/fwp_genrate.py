@@ -60,6 +60,8 @@ def index_text(pdf,col):
  
 
 #//*----------setting of Pdf Pages---*//
+
+# 1e3 == 1000 where 'e' is exponential power of 10 (10 raise to power 3 = 1* 10^3)
 #//*--Setting 0 to 0.0K
 def format_cash(amount):
     negative_flag = False
@@ -72,28 +74,28 @@ def format_cash(amount):
     
     if amount < 1e3:
         x = str(truncate_float((amount / 1e3), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e3 <= amount < 1e5:
         x = str(truncate_float((amount / 1e5) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e5 <= amount < 1e7:
         x = str(truncate_float((amount / 1e7) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if amount >= 1e7:
         x = str(truncate_float(amount / 1e7, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "Cr"
         else:
             return '-'+x + "Cr"
@@ -110,14 +112,14 @@ def format_cash2(amount):
     
     if amount <= 1e1:
         x = str(truncate_float((amount / 1e5), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if 1e1 < amount <= 1e3:
         x = str(truncate_float((amount / 1e3), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
@@ -125,21 +127,21 @@ def format_cash2(amount):
 
     if 1e3 <= amount < 1e5:
         x = str(truncate_float((amount / 1e5) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e5 <= amount < 1e7:
         x = str(truncate_float((amount / 1e7) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if amount >= 1e7:
         x = str(truncate_float(amount / 1e7, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "Cr"
         else:
             return '-'+x + "Cr"
@@ -156,7 +158,7 @@ def format_cash3(amount):
 
     if amount < 1e3:
         x = str(truncate_float((amount), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x
         else:
             return '-'+x
@@ -164,21 +166,21 @@ def format_cash3(amount):
 
     if 1e3 <= amount < 1e5:
         x = str(truncate_float((amount / 1e5) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e5 <= amount < 1e7:
         x = str(truncate_float((amount / 1e7) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if amount >= 1e7:
         x = str(truncate_float(amount / 1e7, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "Cr"
         else:
             return '-'+x + "Cr"
