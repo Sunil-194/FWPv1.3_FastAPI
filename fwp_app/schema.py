@@ -5,9 +5,10 @@ import uuid as uuid_pkg
 import sqlalchemy
 import datetime
 
-class webhook_check(BaseModel):
-    name:str
-    number: str
+class user_api(BaseModel):
+    fc_uuid:str
     
     class Config():
         orm_mode = True  
+        
+    

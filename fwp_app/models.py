@@ -33,7 +33,8 @@ def generate_uuid():
 class task_log(Base):
     __tablename__ = 'task_log'
     id = Column(Integer,primary_key=True,index= True)
-    uuid = Column(String)
+    fc_uuid = Column(String)
+    user_uuid = Column(String)
     name = Column(String)
     task_id = Column(String)
     created_time = Column(TIMESTAMP)
@@ -42,3 +43,12 @@ class task_log(Base):
     status = Column(String)
     traceback = Column(TEXT)
     webhook_status = Column(String)
+    
+class create_fwp_log(Base):
+    __tablename__ = 'api_log'
+    id = Column(Integer,primary_key=True,index= True)
+    fc_uuid = Column(String)
+    status = Column(String)
+    created_time = Column(TIMESTAMP)
+    updated_time = Column(TIMESTAMP)
+    traceback = Column(TEXT)

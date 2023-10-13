@@ -7,7 +7,7 @@ import sys
 import os
 from .  import models
 from . import routers
-from . routers.fwp.fwp_genrate import api_call
+from .routers.fwp.fwp_genrate2 import api_call
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends
 from datetime import datetime as dt

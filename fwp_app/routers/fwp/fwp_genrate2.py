@@ -1,11 +1,12 @@
-from fpdf import FPDF
+from fpdf import FPDF,HTMLMixin
 from os.path import join
 from PIL import ImageColor
 import sys
 import os, glob
 import json
+import requests
 import datetime as dt
-from datetime import datetime
+import openpyxl
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -21,6 +22,10 @@ import PyPDF2
 import math 
 import traceback
 from PyPDF2 import PdfWriter
+import boto3
+
+
+
 
 class InvalidUserID(Exception):
     
@@ -33,6 +38,7 @@ class InvalidUserID(Exception):
 def api_call(json_data,save_path):          
     final_pdf_name = json_data['meta']['user_uuid']
     money_sign_pdf(json_data,final_pdf_name,save_path)
+
  
 #//*---PDF INDEX NUMBER SETUP-----*//
 your_fin_prof_idx = 0 
@@ -54,6 +60,8 @@ def index_text(pdf,col):
  
 
 #//*----------setting of Pdf Pages---*//
+
+# 1e3 == 1000 where 'e' is exponential power of 10 (10 raise to power 3 = 1* 10^3)
 #//*--Setting 0 to 0.0K
 def format_cash(amount):
     negative_flag = False
@@ -66,28 +74,28 @@ def format_cash(amount):
     
     if amount < 1e3:
         x = str(truncate_float((amount / 1e3), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e3 <= amount < 1e5:
         x = str(truncate_float((amount / 1e5) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e5 <= amount < 1e7:
         x = str(truncate_float((amount / 1e7) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if amount >= 1e7:
         x = str(truncate_float(amount / 1e7, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "Cr"
         else:
             return '-'+x + "Cr"
@@ -104,14 +112,14 @@ def format_cash2(amount):
     
     if amount <= 1e1:
         x = str(truncate_float((amount / 1e5), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if 1e1 < amount <= 1e3:
         x = str(truncate_float((amount / 1e3), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
@@ -119,21 +127,21 @@ def format_cash2(amount):
 
     if 1e3 <= amount < 1e5:
         x = str(truncate_float((amount / 1e5) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e5 <= amount < 1e7:
         x = str(truncate_float((amount / 1e7) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if amount >= 1e7:
         x = str(truncate_float(amount / 1e7, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "Cr"
         else:
             return '-'+x + "Cr"
@@ -150,7 +158,7 @@ def format_cash3(amount):
 
     if amount < 1e3:
         x = str(truncate_float((amount), 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x
         else:
             return '-'+x
@@ -158,21 +166,21 @@ def format_cash3(amount):
 
     if 1e3 <= amount < 1e5:
         x = str(truncate_float((amount / 1e5) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "K"
         else:
             return '-'+x + "K"
 
     if 1e5 <= amount < 1e7:
         x = str(truncate_float((amount / 1e7) * 100, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "L"
         else:
             return '-'+x + "L"
 
     if amount >= 1e7:
         x = str(truncate_float(amount / 1e7, 2))
-        if negative_flag==False:
+        if not negative_flag:
             return x + "Cr"
         else:
             return '-'+x + "Cr"
@@ -203,6 +211,7 @@ for f in glob.glob("*.pkl"):
   
 # reportpath=os.getcwd()+'/public/money-sign-reports/'
 cwd = script_dir = os.path.abspath( os.path.dirname(__file__) )
+
 logo = join(cwd,'assets','images','logo','1FBlack.png')
 logo2 = join(cwd,'assets','images','logo','1FBlackPB.png')
 
@@ -243,17 +252,20 @@ def money_sign_pdf(json_data,final_pdf_name,save_path):
         if item.endswith(".pkl"):
             os.remove(os.path.join(Inter_font, item))
     
-                
+    print('\n\n\n cwd', cwd)
     pdf.set_auto_page_break(False)            
-    pdf.add_font('LeagueSpartan-SemiBold', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan','static', 'LeagueSpartan-SemiBold.ttf'))
-    pdf.add_font('LeagueSpartan-Bold', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan','static', 'LeagueSpartan-Bold.ttf'))
-    pdf.add_font('LeagueSpartan-Regular', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan','static', 'LeagueSpartan-Regular.ttf'))
-    pdf.add_font('LeagueSpartan-Medium', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan', 'static', 'LeagueSpartan-Medium.ttf'))
-    pdf.add_font('LeagueSpartan-Light', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan', 'static', 'LeagueSpartan-Light.ttf'))
-    pdf.add_font('Prata', '', os.path.join(cwd, 'assets', 'fonts', 'Prata','Prata-Regular.ttf'))
-    pdf.add_font('Inter-Light', '', os.path.join(cwd, 'assets', 'fonts', 'Inter','static','Inter-Light.ttf'))
-
-
+    try:
+                
+        pdf.add_font('LeagueSpartan-SemiBold', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan','static', 'LeagueSpartan-SemiBold.ttf'))
+        pdf.add_font('LeagueSpartan-Bold', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan','static', 'LeagueSpartan-Bold.ttf'))
+        pdf.add_font('LeagueSpartan-Regular', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan','static', 'LeagueSpartan-Regular.ttf'))
+        pdf.add_font('LeagueSpartan-Medium', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan', 'static', 'LeagueSpartan-Medium.ttf'))
+        pdf.add_font('LeagueSpartan-Light', '', os.path.join(cwd, 'assets', 'fonts', 'League_Spartan', 'static', 'LeagueSpartan-Light.ttf'))
+        pdf.add_font('Prata', '', os.path.join(cwd, 'assets', 'fonts', 'Prata','Prata-Regular.ttf'))
+        pdf.add_font('Inter-ExtraLight', '', os.path.join(cwd, 'assets', 'fonts', 'Inter','static','Inter-ExtraLight.ttf'))
+    except:
+        raise traceback.format_exc()
+    
     # c_MoneyS = user_data['moneySign'].split(' ')
     try:
         money_sign = json_data['money_sign']['money_sign']
@@ -261,7 +273,7 @@ def money_sign_pdf(json_data,final_pdf_name,save_path):
         c_MoneyS = c_MoneyS[-1].strip()
     except:
         print('User Does not have his Money Sign')
-        return traceback.format_exc() 
+        raise traceback.format_exc() 
 
 
     
@@ -375,46 +387,46 @@ def money_sign_pdf(json_data,final_pdf_name,save_path):
         return None
     content(pdf,json_data,c_MoneyS,money_signData)
     fin_profile(pdf, json_data,c_MoneyS,money_signData)
-    # fbs(pdf,json_data,c_MoneyS,money_signData)
-    # money_signtm(pdf,json_data,c_MoneyS,money_signData)
-    # behave_bias(pdf,json_data,c_MoneyS,money_signData)
-    # gen_profile(pdf,json_data,c_MoneyS,money_signData)
-    # your_1_view_detail(pdf,json_data,c_MoneyS,money_signData)
-    # assets_chart(pdf,json_data,c_MoneyS,money_signData)
-    # liabilities_chart(pdf,json_data,c_MoneyS,money_signData)
-    # emergency_planning(pdf,json_data,c_MoneyS,money_signData)
-    # exp_lib_mang(pdf,json_data,c_MoneyS,money_signData)
-    # asset_allocation(pdf,json_data,c_MoneyS,money_signData)
-    # net_worth(pdf,json_data,c_MoneyS,money_signData)
-    # net_worth_projection(pdf,json_data,c_MoneyS,money_signData)
-    # assumptions(pdf,json_data,c_MoneyS,money_signData)
-    # bureao_report(pdf,json_data,c_MoneyS,money_signData)
-    # libility_management_1(pdf,json_data,c_MoneyS,money_signData)
+    fbs(pdf,json_data,c_MoneyS,money_signData)
+    money_signtm(pdf,json_data,c_MoneyS,money_signData)
+    behave_bias(pdf,json_data,c_MoneyS,money_signData)
+    gen_profile(pdf,json_data,c_MoneyS,money_signData)
+    your_1_view_detail(pdf,json_data,c_MoneyS,money_signData)
+    assets_chart(pdf,json_data,c_MoneyS,money_signData)
+    liabilities_chart(pdf,json_data,c_MoneyS,money_signData)
+    emergency_planning(pdf,json_data,c_MoneyS,money_signData)
+    exp_lib_mang(pdf,json_data,c_MoneyS,money_signData)
+    asset_allocation(pdf,json_data,c_MoneyS,money_signData)
+    net_worth(pdf,json_data,c_MoneyS,money_signData)
+    net_worth_projection(pdf,json_data,c_MoneyS,money_signData)
+    assumptions(pdf,json_data,c_MoneyS,money_signData)
+    bureao_report(pdf,json_data,c_MoneyS,money_signData)
+    libility_management_1(pdf,json_data,c_MoneyS,money_signData)
     insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData)
+    insurance_policy_recommendation_summary(pdf,json_data,c_MoneyS,money_signData)
     mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData)
-    # credit_card_evaluation(pdf,json_data,c_MoneyS,money_signData)
     fin_wellness_plan(pdf,json_data,c_MoneyS,money_signData)
-    # cashflow_plan(pdf,json_data,c_MoneyS,money_signData)
-    # term_insurance(pdf,json_data,c_MoneyS,money_signData)
-    # health_insurance(pdf,json_data,c_MoneyS,money_signData)
-    # equity_mutual_fund(pdf,json_data,c_MoneyS,money_signData)
-    # debt_mutual_fund(pdf,json_data,c_MoneyS,money_signData)
-    # hybrid_mutual_fund(pdf,json_data,c_MoneyS,money_signData)
-    # credit_card(pdf,json_data,c_MoneyS,money_signData)
-    # building_strong_credit_profile(pdf,json_data,c_MoneyS,money_signData)
-    # planning_your_taxes(pdf,json_data,c_MoneyS,money_signData)
-    # aval_tax_deduct_1(pdf,json_data,c_MoneyS,money_signData)
-    # aval_tax_deduct_2(pdf,json_data,c_MoneyS,money_signData)
-    # aval_tax_deduct_3(pdf,json_data,c_MoneyS,money_signData)
-    # aval_tax_deduct_4(pdf,json_data,c_MoneyS,money_signData)
-    # aval_tax_deduct_5(pdf,json_data,c_MoneyS,money_signData)
+    cashflow_plan(pdf,json_data,c_MoneyS,money_signData)
+    term_insurance(pdf,json_data,c_MoneyS,money_signData)
+    health_insurance(pdf,json_data,c_MoneyS,money_signData)
+    equity_mutual_fund(pdf,json_data,c_MoneyS,money_signData)
+    debt_mutual_fund(pdf,json_data,c_MoneyS,money_signData)
+    hybrid_mutual_fund(pdf,json_data,c_MoneyS,money_signData)
+    credit_card(pdf,json_data,c_MoneyS,money_signData)
+    building_strong_credit_profile(pdf,json_data,c_MoneyS,money_signData)
+    planning_your_taxes(pdf,json_data,c_MoneyS,money_signData)
+    aval_tax_deduct_1(pdf,json_data,c_MoneyS,money_signData)
+    aval_tax_deduct_2(pdf,json_data,c_MoneyS,money_signData)
+    aval_tax_deduct_3(pdf,json_data,c_MoneyS,money_signData)
+    aval_tax_deduct_4(pdf,json_data,c_MoneyS,money_signData)
+    aval_tax_deduct_5(pdf,json_data,c_MoneyS,money_signData)
     capital_gains_1(pdf,json_data,c_MoneyS,money_signData)
     capital_gains_2(pdf,json_data,c_MoneyS,money_signData)
     capital_gains_3(pdf,json_data,c_MoneyS,money_signData)
     capital_gains_4(pdf,json_data,c_MoneyS,money_signData)
-    # planning_for_inheritance(pdf,json_data,c_MoneyS,money_signData)
-    # understanding_inheritance(pdf,json_data,c_MoneyS,money_signData)
-    # planning_your_esate_will(pdf,json_data,c_MoneyS,money_signData)
+    planning_for_inheritance(pdf,json_data,c_MoneyS,money_signData)
+    understanding_inheritance(pdf,json_data,c_MoneyS,money_signData)
+    planning_your_esate_will(pdf,json_data,c_MoneyS,money_signData)
     disclaimer(pdf,json_data,c_MoneyS,money_signData)
     lastpage(pdf,json_data,c_MoneyS,money_signData)
     
@@ -445,10 +457,11 @@ def money_sign_pdf(json_data,final_pdf_name,save_path):
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
         
-        output_file = str(final_pdf_name)+'.pdf'
+        ts = dt.datetime.now()
+        ts = str(ts.strftime("%d-%m-%Y"))
+        output_file = str(final_pdf_name)+f'_{ts}'+'.pdf'
         opfile = join(save_path,output_file)
         pdf_output.write(opfile) 
-        file.close()
         
         # #//*---setting up boto for aws s3
         # s3 = boto3.client(
@@ -459,6 +472,9 @@ def money_sign_pdf(json_data,final_pdf_name,save_path):
         # )
         # s3.upload_fileobj(pdf_output.write(output_file), "your_bucket_name", output_file)
         
+        
+        
+        file.close()
         
             #//*-----File Cleaning----*//
         if os.path.exists("asset_chart.png"):
@@ -618,7 +634,7 @@ def content(pdf,json_data,c_MoneyS,money_signData):
     
     cont_headings = ['Your Financial Profile','Your 1 view','Your Financial Analysis','Your Financial Wellness Plan','Financial Products Featured List','Best Practices']
 
-    cont_para = ['Financial Behaviour Score, MoneySign  , Generation Profile, Life stage','Snapshot, Detailed Snapshot',"Financial Metrics, Net Worth Projection, Liability Analysis, MF Holdings Evaluation, Credit Card Evaluation","Key takeaways, Next 3 Months Action Plan", "Term Insurance Plans, Health Insurance Plans, Equity Mutual Funds, Credit Cards","Building a Strong Credit Profile, Planning Your Income Taxes, Available Tax Deductions, Capital Gains Taxation by Asset Type, Planning For Inheritance, Understanding Inheritance’s Tax Implications, Planning Your Estate and Will"] 
+    cont_para = ['Financial Behaviour Score, MoneySign  , Generation Profile, Life stage','Snapshot, Detailed Snapshot',"Financial Metrics, Net Worth Projection, Liability Analysis, MF Holdings Evaluation","Key takeaways, Next 3 Months Action Plan", "Term Insurance Plans, Health Insurance Plans, Equity Mutual Funds, Credit Cards","Building a Strong Credit Profile, Planning Your Income Taxes, Capital Gains Taxation by Asset Type, Planning For Inheritance, Understanding Inheritance’s Tax Implications, Planning Your Estate and Will"] 
     index_no = [your_fin_prof_idx,your_1_view_idx,your_fin_analysis_idx,your_fw_plan_idx,fin_feat_product_list,best_practices_idx]
     
     for i in range(len(cont_headings)):
@@ -647,7 +663,7 @@ def content(pdf,json_data,c_MoneyS,money_signData):
         pdf.set_xy(px2MM(168),px2MM(cont_para_basey))
         pdf.set_font('LeagueSpartan-Medium', size=px2pts(24))
         pdf.set_text_color(*hex2RGB('#898B90'))
-        pdf.multi_cell(px2MM(1500), px2MM(32),cont_para[i],align='L')
+        pdf.multi_cell(px2MM(1500), px2MM(32),cont_para[i])
 
         #//*---Index Number----*//
         pdf.set_xy(px2MM(1675),px2MM(263+(i*140)))
@@ -659,7 +675,7 @@ def content(pdf,json_data,c_MoneyS,money_signData):
         cont_para_basey+=y_gap
     
     #//*--To print superscritp R 
-    pdf.set_font('Inter-Light', size=16)
+    pdf.set_font('Inter-ExtraLight', size=16)
     pdf.set_text_color(*hex2RGB('#898B90'))
     pdf.set_xy(px2MM(550), px2MM(265))
     pdf.cell(px2MM(16), px2MM(34), '®')
@@ -848,7 +864,7 @@ def money_signtm(pdf,json_data,c_MoneyS,money_signData):
     # pdf.cell(px2MM(30), px2MM(42), 'TM') 
     
     #//*--To print superscritp R 
-    pdf.set_font('Inter-Light', size=36)
+    pdf.set_font('Inter-ExtraLight', size=36)
     pdf.set_text_color(*hex2RGB('#1A1A1D'))
     pdf.set_xy(px2MM(400), px2MM(77))
     pdf.cell(px2MM(90), px2MM(84), '®')  
@@ -911,7 +927,7 @@ def money_signtm(pdf,json_data,c_MoneyS,money_signData):
     
     #//*--To print superscritp R 
     pdf.set_xy(px2MM(1160), px2MM(desc_y))
-    pdf.set_font('Inter-Light', size=18)
+    pdf.set_font('Inter-ExtraLight', size=18)
     pdf.set_text_color(*hex2RGB('#4B4C51'))
     pdf.cell(px2MM(16), px2MM(32), '®')  
     
@@ -3750,11 +3766,11 @@ def bureao_report(pdf,json_data,c_MoneyS,money_signData):
     pdf.multi_cell(px2MM(600), px2MM(text_h),csa['our_evaluation'],align='L')
      #//*---Col 3
     pdf.rect(px2MM(686), px2MM(318), px2MM(1114), px2MM(rect_h),'FD')
-    pdf.set_fill_color(*hex2RGB('#000000'))
-    pdf.circle(x=px2MM(726),y=px2MM(351),r=px2MM(5),style='F')
-    pdf.set_xy(px2MM(746),px2MM(338)) 
+    # pdf.set_fill_color(*hex2RGB('#000000'))
+    # pdf.circle(x=px2MM(728),y=px2MM(351),r=px2MM(5),style='F')
+    pdf.set_xy(px2MM(706),px2MM(338)) 
     pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-    pdf.multi_cell(px2MM(1034), px2MM(comm_h),csa["commentary"],align='L')
+    pdf.multi_cell(px2MM(1074), px2MM(comm_h),csa["commentary"],align='L')
     
     
     
@@ -4048,7 +4064,7 @@ def libility_management_1(pdf,json_data,c_MoneyS,money_signData):
         text_y+=common_gap
         bl_height+=common_gap
         
-    locale.setlocale(locale.LC_MONETARY, 'en_IN')
+    # locale.setlocale(locale.LC_MONETARY, 'en_IN')
     text_y -= 5    
     #//*---Total-----*//
         
@@ -4801,26 +4817,8 @@ def credit_card(pdf,json_data,c_MoneyS,money_signData):
         
         pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
         pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        reward_conversion = list(df['best_reward_points_conversion_rate'].iloc[i].split(' '))
-        reward_text = ''
-        reward_rem = []
-        for k in range(len(reward_conversion)):
-            reward_text = reward_text+' '+reward_conversion[k]
-            if mm2PX(pdf.get_string_width(reward_text)) > 120:
-                reward_text = reward_text.replace(reward_conversion[k],'')
-                reward_rem = reward_conversion[k:]
-                break
-        pdf.set_xy(px2MM(310),px2MM(det_y)) 
-        pdf.multi_cell(px2MM(125), px2MM(32),reward_text,align='L')
-        
-        if not reward_rem == []:
-            pdf.set_xy(px2MM(146),px2MM(det_y+32)) 
-            pdf.multi_cell(px2MM(518), px2MM(32),' '.join(reward_rem),border='LR',align='L')
-        
-        # pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-        # pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        # pdf.set_xy(px2MM(555),px2MM(det_y)) 
-        # pdf.multi_cell(px2MM(125), px2MM(32),df['best_reward_points_conversion_rate'].iloc[i],border='0',align='L')
+        pdf.set_xy(px2MM(555),px2MM(det_y)) 
+        pdf.multi_cell(px2MM(125), px2MM(32),df['best_reward_points_conversion_rate'].iloc[i],border='0',align='L')
     
         
         rem_det = mm2PX(pdf.get_y())-rem+20
@@ -4951,26 +4949,8 @@ def credit_card(pdf,json_data,c_MoneyS,money_signData):
         
         pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
         pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        
-        # pdf.set_xy(px2MM(555),px2MM(det_y)) 
-        # pdf.multi_cell(px2MM(125), px2MM(32),df['best_reward_points_conversion_rate'].iloc[i],border='0',align='L')
-        
-        reward_conversion = list(df['best_reward_points_conversion_rate'].iloc[i].split(' '))
-        reward_text = ''
-        reward_rem = []
-        for k in range(len(reward_conversion)):
-            reward_text = reward_text+' '+reward_conversion[k]
-            if mm2PX(pdf.get_string_width(reward_text)) > 120:
-                reward_text = reward_text.replace(reward_conversion[k],'')
-                reward_rem = reward_conversion[k:]
-                break
         pdf.set_xy(px2MM(555),px2MM(det_y)) 
-        pdf.multi_cell(px2MM(125), px2MM(32),reward_text,align='L')
-        
-        if not reward_rem == []:
-            pdf.set_xy(px2MM(146),px2MM(det_y+32)) 
-            pdf.multi_cell(px2MM(518), px2MM(32),' '.join(reward_rem),align='L')
-        
+        pdf.multi_cell(px2MM(125), px2MM(32),df['best_reward_points_conversion_rate'].iloc[i],border='0',align='L')
     
         
         #//*----Column 2 Value
@@ -5133,18 +5113,18 @@ def aval_tax_deduct_1(pdf,json_data,c_MoneyS,money_signData):
     #//*----Column 3 Value---*//
     
     pdf.set_xy(px2MM(1175),px2MM(296)) 
-    pdf.cell(px2MM(305), px2MM(32),'₹ 1.5L ',align='L')
+    pdf.cell(px2MM(305), px2MM(32),'Rs 1.5L ',align='L')
     pdf.set_xy(px2MM(1175),px2MM(296+32)) 
     pdf.multi_cell(px2MM(315), px2MM(32),'(aggregate of sections 80CCD, 80CCC, 80C)',align='L')
     
     pdf.set_xy(px2MM(1175),px2MM(592)) 
-    pdf.cell(px2MM(305), px2MM(32),'₹ 1.5L',align='L')
+    pdf.cell(px2MM(305), px2MM(32),'Rs 1.5L',align='L')
     pdf.set_xy(px2MM(1175),px2MM(592+32)) 
     pdf.multi_cell(px2MM(315), px2MM(32),'(aggregate of sections 80CCD, 80CCC, 80C)',align='L')
     
     
     pdf.set_xy(px2MM(1175),px2MM(728)) 
-    pdf.cell(px2MM(305), px2MM(32),'₹ 1.5L',align='L')
+    pdf.cell(px2MM(305), px2MM(32),'Rs 1.5L',align='L')
     pdf.set_xy(px2MM(1175),px2MM(728+32)) 
     pdf.multi_cell(px2MM(315), px2MM(32),'(aggregate of sections 80CCD, 80CCC, 80C)',align='L')
     
@@ -5155,7 +5135,7 @@ def aval_tax_deduct_1(pdf,json_data,c_MoneyS,money_signData):
     pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
     
     pdf.set_xy(px2MM(1520),px2MM(296)) 
-    pdf.multi_cell(px2MM(260), px2MM(32),'Individuals and HUFs',align='L')
+    pdf.multi_cell(px2MM(260), px2MM(32),'Individuals, Hindu Undivided Families',align='L')
     
     pdf.set_xy(px2MM(1520),px2MM(592)) 
     pdf.cell(px2MM(260), px2MM(32),'Individuals',align='L')
@@ -5413,7 +5393,7 @@ def aval_tax_deduct_3(pdf,json_data,c_MoneyS,money_signData):
         pdf.circle(x=px2MM(310), y=px2MM(cir_x[i]), r=px2MM(6), style='F')
     
     pdf.set_xy(px2MM(290),px2MM(296)) 
-    pdf.multi_cell(px2MM(845), px2MM(32),'Medical expenditure on self or dependent relative for diseases specified in rule 11DD:',align='L')
+    pdf.multi_cell(px2MM(845), px2MM(32),'Medical expenditure on self or dependent relative for diseases specified in rule 11DD',align='L')
     pdf.set_xy(px2MM(330),px2MM(296+32)) 
     pdf.cell(px2MM(805), px2MM(32),'For less than 60 years old',align='L')
     pdf.set_xy(px2MM(330),px2MM(296+64)) 
@@ -5423,7 +5403,7 @@ def aval_tax_deduct_3(pdf,json_data,c_MoneyS,money_signData):
     pdf.multi_cell(px2MM(805), px2MM(32),'''Interest on education loan''',align='L')
     
     pdf.set_xy(px2MM(330),px2MM(568)) 
-    pdf.multi_cell(px2MM(805), px2MM(32),'''Interest on home loan for first-time homeowners, available for loans sanctioned between 01-Apr-2016 and 31-Mar-2017''',align='L')
+    pdf.multi_cell(px2MM(805), px2MM(32),'''IInterest on home loan for first-time homeowners, available for loans sanctioned between 01-Apr-2016 and 31-Mar-2017''',align='L')
     
     pdf.set_xy(px2MM(330),px2MM(672)) 
     pdf.multi_cell(px2MM(805), px2MM(32),'''Interest on home loan (over and above Rs. 2,00,000 deduction under 24B, allowing taxpayers to deduct total of Rs. 3,50,000 for interest on home loan) for loans sanctioned between 01-Apr-2019 and 31-Mar-2022''',align='L')
@@ -6727,7 +6707,9 @@ def understanding_inheritance(pdf,json_data,c_MoneyS,money_signData)        :
     #//*-----Index Text of Page--**////
     index_text(pdf,'#1A1A1D')
     
-        
+    
+    
+    
 #//*--------------------------MF Holdings Evaluation (new)------------------------------------------------//
 
 def mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData):
@@ -6828,39 +6810,29 @@ def mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData):
     
     for i in range(len(mf_hold)):
 
-        if 1080-rect_y < 124 and i != len(mf_hold)-2 :
-            mf_page_create(pdf) 
-            rect_y = mm2PX(pdf.get_y())+20
-            text_y = rect_y+15
-            col = '#F3F6F9'
-            
-        elif 1080-rect_y < 330 and i == len(mf_hold)-2 :
+        if 1080-rect_y < 124:
             mf_page_create(pdf) 
             rect_y = mm2PX(pdf.get_y())+20
             text_y = rect_y+15
             col = '#F3F6F9'
             
         h_rect = 62
-        h_text = w1 = w2= w3 = 32
+        h_text = w1 = w2 = 32
         gp = 15
         
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#1A1A1D'))
-                
-        if mm2PX(pdf.get_string_width(mf_hold["scheme_name"].iloc[i])) > 350 or mm2PX(pdf.get_string_width(mf_hold["scheme_type"].iloc[i])) > 190 or mm2PX(pdf.get_string_width(mf_hold["plan"].iloc[i])) > 120 :
+        if len(mf_hold["scheme_name"].iloc[i]) > 32 or len(mf_hold["scheme_type"].iloc[i]) > 15:
             h_rect = 94
             h_text = 64
             h_text = w1 = w2 = 64
             
-        if mm2PX(pdf.get_string_width(mf_hold["scheme_name"].iloc[i])) > 350:
+        if len(mf_hold["scheme_name"].iloc[i]) > 32:
             w1 = 32
-        if mm2PX(pdf.get_string_width(mf_hold["scheme_type"].iloc[i])) > 190:
+        if len(mf_hold["scheme_type"].iloc[i]) > 15:
             w2 = 32
-            
-        if mm2PX(pdf.get_string_width(mf_hold["plan"].iloc[i])) > 120:
-            w3 = 32 
-            
-
+           
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        
         if i == (len(mf_hold)-1):
             pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
             pdf.set_fill_color(*hex2RGB('#B9BABE'))
@@ -6882,11 +6854,11 @@ def mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData):
         
         #//*--Col 1
         pdf.set_xy(px2MM(140),px2MM(text_y)) 
-        pdf.multi_cell(px2MM(355), px2MM(w1),mf_hold["scheme_name"].iloc[i],align='L')
+        pdf.multi_cell(px2MM(345), px2MM(w1),mf_hold["scheme_name"].iloc[i],align='L')
         
         #//*--Col 2
         pdf.set_xy(px2MM(536),px2MM(text_y)) 
-        pdf.multi_cell(px2MM(120), px2MM(w3),mf_hold["plan"].iloc[i],align='L')
+        pdf.multi_cell(px2MM(120), px2MM(h_text),mf_hold["plan"].iloc[i],align='L')
         
         #//*--Col 3
         pdf.set_xy(px2MM(696),px2MM(text_y)) 
@@ -6955,7 +6927,7 @@ def mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData):
 
     
     #//*---1st Comment----*//
-    if (1080-rem) > 120:  
+    if (1080-rem) > 150:  
         for i in range (len(mf_comment1)):
             pdf.set_font('LeagueSpartan-Light', size=px2pts(18))
             pdf.set_text_color(*hex2RGB('#000000'))
@@ -7029,7 +7001,7 @@ def mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData):
             
             pdf.set_text_color(*hex2RGB('#000000'))
             pdf.set_font('LeagueSpartan-Regular',size=px2pts(30))
-            pdf.set_xy(px2MM(142),px2MM(rem1+84))
+            pdf.set_xy(px2MM(150),px2MM(rem1+84))
             pdf.cell(px2MM(1650), px2MM(42),""" to estimate excess commissions paid by you till date.""",align='L')
             
             rem2 = mm2PX(pdf.get_y())+42
@@ -7125,6 +7097,7 @@ def mf_holding_eveluation(pdf,json_data,c_MoneyS,money_signData):
         #//*-----Index Text of Page--**////
         index_text(pdf,'#1A1A1D') 
         
+
 
 #//*----------------------------------**------------------------------------------------//
 
@@ -7242,13 +7215,7 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
     
     for i in range(len(insurance_policy)):
 
-        if 1080-rect_y < 182 and i != len(insurance_policy)-2:
-            insur_page_create(pdf) 
-            rect_y = mm2PX(pdf.get_y())+63
-            text_y = rect_y+15
-            col = '#F3F6F9'
-            
-        elif 1080-rect_y < 252 and i == len(insurance_policy)-2:
+        if 1080-rect_y < 182:
             insur_page_create(pdf) 
             rect_y = mm2PX(pdf.get_y())+63
             text_y = rect_y+15
@@ -7303,25 +7270,25 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         pdf.multi_cell(px2MM(150), px2MM(h_text),insurance_policy["plan_type"].iloc[i],align='L')
         
         #//*--Col 3
-        pdf.set_xy(px2MM(505),px2MM(text_y)) 
-        pdf.multi_cell(px2MM(120), px2MM(h_text),insurance_policy["start_date"].iloc[i],align='C')
+        pdf.set_xy(px2MM(520),px2MM(text_y)) 
+        pdf.multi_cell(px2MM(100), px2MM(h_text),insurance_policy["start_date"].iloc[i],align='C')
         
         #//*--Col 4
-        pdf.set_xy(px2MM(640),px2MM(text_y)) 
-        pdf.multi_cell(px2MM(80), px2MM(h_text),insurance_policy["policy_tenure"].iloc[i],border='0',align='R')
+        pdf.set_xy(px2MM(650),px2MM(text_y)) 
+        pdf.multi_cell(px2MM(70), px2MM(h_text),insurance_policy["policy_tenure"].iloc[i],align='R')
         
         #//*--Col 5
         pdf.set_xy(px2MM(760),px2MM(text_y)) 
         if insurance_policy["annual_premium"].iloc[i] == "":
-            pdf.multi_cell(px2MM(90), px2MM(h_text),'-',align='R')
+            pdf.multi_cell(px2MM(90), px2MM(h_text),'₹ 0.0K',align='R')
         else:   
             val1 = '₹ '+str(format_cash2(float(insurance_policy["annual_premium"].iloc[i])))
             pdf.multi_cell(px2MM(90), px2MM(h_text),val1,align='R')
         
         #//*--Col 6    
         pdf.set_xy(px2MM(890),px2MM(text_y)) 
-        if insurance_policy["life_cover"].iloc[i] == "":
-            pdf.multi_cell(px2MM(120), px2MM(h_text),'-',align='R')
+        if insurance_policy["life_cover"].iloc[i] == 0:
+            pdf.multi_cell(px2MM(120), px2MM(h_text),'₹ 0.0K',align='R')
         else:
             val1 = '₹ '+str(format_cash2(float(insurance_policy["life_cover"].iloc[i])))
             pdf.multi_cell(px2MM(120), px2MM(h_text),val1,align='R')
@@ -7329,7 +7296,7 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         #//*--Col 7
         pdf.set_xy(px2MM(1050),px2MM(text_y)) 
         if insurance_policy["premium_paid_till_date"].iloc[i]=="":
-            pdf.multi_cell(px2MM(120), px2MM(h_text),"-",align='R')
+            pdf.multi_cell(px2MM(120), px2MM(h_text),"₹ 0.0K",align='R')
         else:
             val1 = '₹ '+str(format_cash2(float(insurance_policy["premium_paid_till_date"].iloc[i])))
             pdf.multi_cell(px2MM(120), px2MM(h_text),val1,align='R')
@@ -7337,7 +7304,7 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         #//*--Col 8
         pdf.set_xy(px2MM(1199),px2MM(text_y)) 
         if insurance_policy["premium_payable"].iloc[i]=="":
-            pdf.multi_cell(px2MM(110), px2MM(h_text),"-",align='R')
+            pdf.multi_cell(px2MM(110), px2MM(h_text),"₹ 0.0K",align='R')
         else:
             val = '₹ '+str(format_cash3(float(insurance_policy["premium_payable"].iloc[i])))
             pdf.multi_cell(px2MM(110), px2MM(h_text),val,align='R')
@@ -7369,7 +7336,7 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         
         
         #//*-----Index Text of Page--**////
-        rem_y = mm2PX(pdf.get_y())+57
+        rem = mm2PX(pdf.get_y())+57
     
         pdf.set_xy(px2MM(1870), px2MM(1018))  
         pdf.set_font('LeagueSpartan-Light', size=px2pts(30))
@@ -7394,360 +7361,258 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         pdf.rect(px2MM(0), px2MM(80), px2MM(15), px2MM(84),'F') 
         
         #//*-----Index Text of Page--**////
-        rem_y = mm2PX(pdf.get_y())+120
+        rem = mm2PX(pdf.get_y())+120
         index_text(pdf,'#1A1A1D') 
-        return rem_y
+        return rem
 
-    # suggested_action = list(set(insurance_policy["suggested_action"].tolist()))
-    # suggested_action = [x.lower() for x in suggested_action]
+    suggested_action = list(set(insurance_policy["suggested_action"].tolist()))
+    suggested_action = [x.lower() for x in suggested_action]
     pt_no = 1
  
 
     #//*---1st Comment----*//
     tab_comments = ['* All premium amounts are converted to annual figures based on the frequency of premium payments (quarterly, semi-annual, etc.)','** Surrender value is an estimate derived from the general surrender value factor applied to insurance policies in case of surrender. The total surrender value excludes ULIPs and Annuities.']
-    if not (1080-rem_y) > 100 :
-        rem_y = ins_page_add(pdf)
+    if not (1080-rem) > 100 :
+        rem = ins_page_add(pdf)
         
     for i in range(2):
         pdf.set_font('LeagueSpartan-Light', size=px2pts(18))
         pdf.set_text_color(*hex2RGB('#000000'))
-        pdf.set_xy(px2MM(120),px2MM(rem_y)) 
+        pdf.set_xy(px2MM(120),px2MM(rem)) 
         pdf.cell(px2MM(1680), px2MM(25),tab_comments[i],align='L')
-        rem_y = mm2PX(pdf.get_y())+35
+        rem = mm2PX(pdf.get_y())+35
         
-    #//*-------------Main Comments------------------*///
-    
-    if not (1080-rem_y) > 330:
-            rem_y = ins_page_add(pdf)
-    else:
-        rem_y = mm2PX(pdf.get_y())+75
+    #//*---4 points Comments----*//
+            
+    if 'surrender' in suggested_action:
+        if not (1080-rem) > 330:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+75
+            
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(40))
+        pdf.set_text_color(*hex2RGB('#000000'))
+        pdf.set_xy(px2MM(120),px2MM(rem)) 
+        pdf.cell(px2MM(170), px2MM(56),'Comments',align='L')
         
-    pdf.set_font('LeagueSpartan-Regular', size=px2pts(40))
-    pdf.set_text_color(*hex2RGB('#000000'))
-    pdf.set_xy(px2MM(120),px2MM(rem_y)) 
-    pdf.cell(px2MM(170), px2MM(56),'Comments',align='L')
-    
-    comments = json_data["insurance_policy_evaluation"]['comment']
-    rem_y = mm2PX(pdf.get_y())+86
-    
-    for i in range(len(comments)):
+        rem = mm2PX(pdf.get_y())+86
         
-        # if i == 1:
-        #     break
-        
-        if not (1080-rem_y) > 280:
-            rem_y = ins_page_add(pdf)
-
-        
+        #//*--1st point
         pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
         pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        pdf.set_xy(px2MM(120),px2MM(rem_y)) 
+        pdf.set_xy(px2MM(120),px2MM(rem)) 
         pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
         
         pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-        pdf.set_xy(px2MM(150),px2MM(rem_y)) 
+        pdf.set_xy(px2MM(150),px2MM(rem)) 
         pdf.cell(px2MM(200), px2MM(42),'For policies where,',align='L')
         
         pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-        pdf.set_xy(px2MM(385),px2MM(rem_y)) 
-        str_w = mm2PX(pdf.get_string_width(comments[i]['suggested_action']))
-        pdf.cell(px2MM(str_w+30), px2MM(42),'"'+comments[i]['suggested_action']+'"',align='L')
-        
-        rem_x = mm2PX(pdf.get_x())
+        pdf.set_xy(px2MM(385),px2MM(rem)) 
+        pdf.cell(px2MM(100), px2MM(42),'"Surrender"',align='L')
         
         pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-        pdf.set_xy(px2MM(rem_x),px2MM(rem_y)) 
+        pdf.set_xy(px2MM(545),px2MM(rem)) 
         pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
         
-        rem_y = mm2PX(pdf.get_y())+72
+        rem = mm2PX(pdf.get_y())+58
+        pdf.set_fill_color(*hex2RGB('#000000'))
+        pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
         
-        for j in range(len(comments[i]['points'])):
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(160), px2MM(42),'Endowment:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(347),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Unless the policy is linked to a financial goal, limit your losses by surrendering as the yield is generally low at 3-4% p.a.',align='L')
+        
+        
+        if not (1080-rem) > 220:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+58
             
-            if not (1080-rem_y) > 220:
-                rem_y = ins_page_add(pdf)
-
-                
-            pdf.set_fill_color(*hex2RGB('#000000'))
-            pdf.rect(px2MM(150), px2MM(rem_y+20), px2MM(10), px2MM(10),'F')
+        pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(200), px2MM(42),'ULIP Policies:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(360),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Unless the policy is linked to a financial goal, surrendering is better because charges related to administration, fund',align='L')
+        
+        pdf.set_xy(px2MM(180),px2MM(rem+42)) 
+        pdf.cell(px2MM(1650), px2MM(42),'management, premium allocation, mortality, etc. greatly reduce the investible amount.',align='L')
+        
+        if not (1080-rem) > 220:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+58
             
-            pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-            pdf.set_text_color(*hex2RGB('#1A1A1D'))
-            pdf.set_xy(px2MM(180),px2MM(rem_y)) 
-            pdf.cell(px2MM(160), px2MM(42),comments[i]['points'][j]['plan_type']+':',align='L')
+        pdf.rect(px2MM(150),px2MM(rem+20), px2MM(10), px2MM(10),'F')
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(200), px2MM(42),'Annuity:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(300),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Avoid incurring surrender charges when the policy has less time to maturity.',align='L')
+        
+        if not (1080-rem) > 226:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+58
             
-            rem_y = mm2PX(pdf.get_y())+52
-            
-            for k in range(len(comments[i]['points'][j]['description'])):
-                pdf.circle(x=px2MM(180), y=px2MM(rem_y+14), r=px2MM(7), style='F')
-                pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-                pdf.set_xy(px2MM(200),px2MM(rem_y)) 
-                pdf.multi_cell(px2MM(1590), px2MM(42),comments[i]['points'][j]['description'][k],align='L')
-                
-                rem_y = mm2PX(pdf.get_y())
-                
-            rem_y = mm2PX(pdf.get_y())+16
-            
-        rem_y = mm2PX(pdf.get_y())+30
+        pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(200), px2MM(42),'Whole Life Policies:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(430),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Choosing an annuity plan with an insurer is comparatively costly due to charges related to administration, fund',align='L')
+        
+        pdf.set_xy(px2MM(180),px2MM(rem+42)) 
+        pdf.multi_cell(px2MM(1650), px2MM(42),'management, premium allocation, mortality (if applicable), etc. Consider standalone pension solutions like NPS, which have low fees, more investment options, and better long-term returns.',align='L')
         pt_no+=1
         
-                
+    if 'stop premium payment' in suggested_action:
+    
+        if not (1080-rem) > 220:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+40
+        
+        #//*--2nd point
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(120),px2MM(rem)) 
+        pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(150),px2MM(rem)) 
+        pdf.cell(px2MM(300), px2MM(42),'For policies where,',align='L')
+        
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_xy(px2MM(380),px2MM(rem)) 
+        pdf.cell(px2MM(300), px2MM(42),'"Stop premium payment"',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(715),px2MM(rem)) 
+        pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
+        
+        rem = mm2PX(pdf.get_y())+58
+        pdf.set_fill_color(*hex2RGB('#000000'))
+        pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
+        
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(160), px2MM(42),'Endowment:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(347),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Limit your loss early on as surrendering after 3 years leads to significant value erosion. Also, the yield on such traditional ',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(180),px2MM(rem+42)) 
+        pdf.cell(px2MM(1450), px2MM(42),'products is generally low at 3-4% p.a.',align='L')
+        
+        pt_no+=1
+        
+    if 'continue till maturity' in suggested_action:
+    
+        if not (1080-rem) > 300:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+80
             
+        #//*--3rd point
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(120),px2MM(rem)) 
+        pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
         
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(150),px2MM(rem)) 
+        pdf.cell(px2MM(300), px2MM(42),'For policies where,',align='L')
         
-  
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_xy(px2MM(380),px2MM(rem)) 
+        pdf.cell(px2MM(300), px2MM(42),'"Continue till Maturity"',align='L')
         
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(685),px2MM(rem)) 
+        pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
         
-    # #//*---4 points Comments----*//
+        rem = mm2PX(pdf.get_y())+58
+        pdf.set_fill_color(*hex2RGB('#000000'))
+        pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
+        
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(300), px2MM(42),'Whole Life Plan:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(400),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Avoid incurring surrender charges when the policy has less time to maturity.',align='L')
+        
+        pt_no+=1
     
-    # if 'surrender' in suggested_action or 'stop premium payment' in suggested_action or 'continue till maturity' in suggested_action or 'continue till lock-in period' in suggested_action:
-    #     if not (1080-rem) > 330:
-    #             rem = ins_page_add(pdf)
-    #     else:
-    #         rem = mm2PX(pdf.get_y())+75
-            
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(40))
-    #     pdf.set_text_color(*hex2RGB('#000000'))
-    #     pdf.set_xy(px2MM(120),px2MM(rem)) 
-    #     pdf.cell(px2MM(170), px2MM(56),'Comments',align='L')
-    
-    # #//*---Comment 1-----*//        
-    # if 'surrender' in suggested_action:
-        
-    #     rem = mm2PX(pdf.get_y())+86
-        
-    #     #//*--1st point
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(120),px2MM(rem)) 
-    #     pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(150),px2MM(rem)) 
-    #     pdf.cell(px2MM(200), px2MM(42),'For policies where,',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_xy(px2MM(385),px2MM(rem)) 
-    #     pdf.cell(px2MM(100), px2MM(42),'"Surrender"',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(545),px2MM(rem)) 
-    #     pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
-        
-    #     rem = mm2PX(pdf.get_y())+58
-    #     pdf.set_fill_color(*hex2RGB('#000000'))
-    #     pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(160), px2MM(42),'Endowment:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(347),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Unless the policy is linked to a financial goal, limit your losses by surrendering as the yield is generally low at 3-4% p.a.',align='L')
-        
-        
-    #     if not (1080-rem) > 220:
-    #         rem = ins_page_add(pdf)
-    #     else:
-    #         rem = mm2PX(pdf.get_y())+58
-            
-    #     pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(200), px2MM(42),'ULIP Policies:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(360),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Unless the policy is linked to a financial goal, surrendering is better because charges related to administration, fund',align='L')
-        
-    #     pdf.set_xy(px2MM(180),px2MM(rem+42)) 
-    #     pdf.cell(px2MM(1650), px2MM(42),'management, premium allocation, mortality, etc. greatly reduce the investible amount.',align='L')
-        
-    #     if not (1080-rem) > 220:
-    #         rem = ins_page_add(pdf)
-    #     else:
-    #         rem = mm2PX(pdf.get_y())+58
-            
-    #     pdf.rect(px2MM(150),px2MM(rem+20), px2MM(10), px2MM(10),'F')
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(200), px2MM(42),'Annuity:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(300),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Avoid incurring surrender charges when the policy has less time to maturity.',align='L')
-        
-    #     if not (1080-rem) > 226:
-    #         rem = ins_page_add(pdf)
-    #     else:
-    #         rem = mm2PX(pdf.get_y())+58
-            
-    #     pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(200), px2MM(42),'Whole Life Policies:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(430),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Choosing an annuity plan with an insurer is comparatively costly due to charges related to administration, fund',align='L')
-        
-    #     pdf.set_xy(px2MM(180),px2MM(rem+42)) 
-    #     pdf.multi_cell(px2MM(1650), px2MM(42),'management, premium allocation, mortality (if applicable), etc. Consider standalone pension solutions like NPS, which have low fees, more investment options, and better long-term returns.',align='L')
-    #     pt_no+=1
-     
-    # #//*---Comment 2-----*//       
-    # if 'stop premium payment' in suggested_action:
-        
-    #     rem = mm2PX(pdf.get_y())
-    #     if pt_no == 1:
-    #         rem+=86
-    #     else:
-    #         rem+=30
+    if 'continue till lock-in period' in suggested_action:
 
-    #     if not (1080-rem) > 220:
-    #         rem = ins_page_add(pdf)
+        if not (1080-rem) > 320:
+            rem = ins_page_add(pdf)
+        else:
+            rem = mm2PX(pdf.get_y())+80
+        
+        #//*--2nd point
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(120),px2MM(rem)) 
+        pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(150),px2MM(rem)) 
+        pdf.cell(px2MM(300), px2MM(42),'For policies where,',align='L')
+        
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_xy(px2MM(380),px2MM(rem)) 
+        pdf.cell(px2MM(500), px2MM(42),'"Continue till lock-in period"',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(750),px2MM(rem)) 
+        pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
+        
+        rem = mm2PX(pdf.get_y())+58
+        pdf.set_fill_color(*hex2RGB('#000000'))
+        pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
+        
+        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
+        pdf.set_text_color(*hex2RGB('#1A1A1D'))
+        pdf.set_xy(px2MM(180),px2MM(rem)) 
+        pdf.cell(px2MM(160), px2MM(42),'ULIPS:',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(270),px2MM(rem)) 
+        pdf.cell(px2MM(1450), px2MM(42),'Continue the policy until the end of the lock-in period, as early surrender will move your funds to the discontinuance fund, the',align='L')
+        
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
+        pdf.set_xy(px2MM(180),px2MM(rem+42)) 
+        pdf.multi_cell(px2MM(1650), px2MM(42),"life cover will cease and the fund management charges will still be levied. Post-lock-in period, you will receive the policy's fund value upon surrendering.",align='L')
+        
+        
 
-    #     #//*--2nd point
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(120),px2MM(rem)) 
-    #     pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(150),px2MM(rem)) 
-    #     pdf.cell(px2MM(300), px2MM(42),'For policies where,',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_xy(px2MM(380),px2MM(rem)) 
-    #     pdf.cell(px2MM(300), px2MM(42),'"Stop premium payment"',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(715),px2MM(rem)) 
-    #     pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
-        
-    #     rem = mm2PX(pdf.get_y())+58
-    #     pdf.set_fill_color(*hex2RGB('#000000'))
-    #     pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(160), px2MM(42),'Endowment:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(347),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Limit your loss early on as surrendering after 3 years leads to significant value erosion. Also, the yield on such traditional ',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(180),px2MM(rem+42)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'products is generally low at 3-4% p.a.',align='L')
-        
-    #     pt_no+=1
-     
-    # #//*---Comment 3-----*//       
-    # if 'continue till maturity' in suggested_action:
-        
-    #     rem = mm2PX(pdf.get_y())
-    #     if pt_no == 1:
-    #         rem+=86
-    #     else:
-    #         rem+=72
-    
-    #     if not (1080-rem) > 300:
-    #         rem = ins_page_add(pdf)
 
-            
-    #     #//*--3rd point
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(120),px2MM(rem)) 
-    #     pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(150),px2MM(rem)) 
-    #     pdf.cell(px2MM(300), px2MM(42),'For policies where ',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_xy(px2MM(380),px2MM(rem)) 
-    #     pdf.cell(px2MM(300), px2MM(42),'"Continue till Maturity"',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(685),px2MM(rem)) 
-    #     pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
-        
-    #     rem = mm2PX(pdf.get_y())+58
-    #     pdf.set_fill_color(*hex2RGB('#000000'))
-    #     pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(300), px2MM(42),'Whole Life Plan:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(400),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Avoid incurring surrender charges when the policy has less time to maturity.',align='L')
-        
-    #     pt_no+=1
-    
-    # #//*---Comment 4-----*//   
-    # if 'continue till lock-in period' in suggested_action:
-        
-    #     rem = mm2PX(pdf.get_y())
-    #     if pt_no == 1:
-    #         rem+=86
-    #     else:
-    #         rem+=72
-
-    #     if not (1080-rem) > 260:
-    #         rem = ins_page_add(pdf)
-
-        
-    #     #//*--2nd point
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(120),px2MM(rem)) 
-    #     pdf.cell(px2MM(20), px2MM(42),str(pt_no)+'.',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(150),px2MM(rem)) 
-    #     pdf.cell(px2MM(300), px2MM(42),'For policies where ',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_xy(px2MM(380),px2MM(rem)) 
-    #     pdf.cell(px2MM(500), px2MM(42),'"Continue till lock-in period"',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(750),px2MM(rem)) 
-    #     pdf.cell(px2MM(250), px2MM(42),"is suggested:",align='L')
-        
-    #     rem = mm2PX(pdf.get_y())+58
-    #     pdf.set_fill_color(*hex2RGB('#000000'))
-    #     pdf.rect(px2MM(150), px2MM(rem+20), px2MM(10), px2MM(10),'F')
-        
-    #     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-    #     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-    #     pdf.set_xy(px2MM(180),px2MM(rem)) 
-    #     pdf.cell(px2MM(160), px2MM(42),'ULIPS:',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(270),px2MM(rem)) 
-    #     pdf.cell(px2MM(1450), px2MM(42),'Continue the policy until the end of the lock-in period, as early surrender will move your funds to the discontinuance fund, the',align='L')
-        
-    #     pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-    #     pdf.set_xy(px2MM(180),px2MM(rem+42)) 
-    #     pdf.multi_cell(px2MM(1650), px2MM(42),"life cover will cease and the fund management charges will still be levied. Post-lock-in period, you will receive the policy's fund value upon surrendering.",align='L')
-    
-    
-
-    
-    
-    
-    #//*------Recommendation Summary Page------------*//    
+#//*----------------------------------**------------------------------------------------//
+#//*-----Insurance Policy Evaluation----*//
+def insurance_policy_recommendation_summary(pdf,json_data,c_MoneyS,money_signData):
     try:
         tab_val2 = json_data["insurance_policy_evaluation"]['recommendation_table']
         if tab_val2==[]:
@@ -7849,17 +7714,17 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))  
         pdf.set_xy(px2MM(786),px2MM(514+(i*52))) 
         if cover[i]== "":
-            pdf.multi_cell(px2MM(477), px2MM(32),"-",align='C')
+            pdf.multi_cell(px2MM(477), px2MM(32),"",align='C')
         else:
             val1 = "₹ "+str(format_cash2(float(cover[i])))
             pdf.multi_cell(px2MM(477), px2MM(32),val1,border='0',align='C')
             
-            if i == 1:
-                deg_one = mm2PX(pdf.get_x())+3
-                deg_one = 1024+(mm2PX(pdf.get_string_width(str(val1)))/2)
-                pdf.set_font('LeagueSpartan-Regular', size=px2pts(9))
-                pdf.set_xy(px2MM(deg_one),px2MM(514+(i*52)+4)) 
-                pdf.multi_cell(px2MM(15), px2MM(12),"1",border='0',align='L')
+        if i == 1:
+            deg_one = mm2PX(pdf.get_x())+3
+            deg_one = 1024+(mm2PX(pdf.get_string_width(str(val1)))/2)
+            pdf.set_font('LeagueSpartan-Regular', size=px2pts(9))
+            pdf.set_xy(px2MM(deg_one),px2MM(514+(i*52)+4)) 
+            pdf.multi_cell(px2MM(15), px2MM(12),"1",border='0',align='L')
         
         #//*--col 3
         pdf.set_xy(px2MM(1303),px2MM(514+(i*52))) 
@@ -7869,20 +7734,20 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         else:
             pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
         if annual_premium[i] == "" :   
-            pdf.multi_cell(px2MM(477), px2MM(32),'-',align='C')
+            pdf.multi_cell(px2MM(477), px2MM(32),' ',align='C')
         else:
             val2 = "₹ "+str(format_cash2(float(annual_premium[i])))
             pdf.multi_cell(px2MM(477), px2MM(32),val2,align='C')
             
-            deg_two = 1541+(mm2PX(pdf.get_string_width(str(val2)))/2)    
-            pdf.set_font('LeagueSpartan-Regular', size=px2pts(9))
-            if i == 1:
-                pdf.set_xy(px2MM(deg_two),px2MM(514+(i*52)+4)) 
-                pdf.multi_cell(px2MM(15), px2MM(12),"2",border='0',align='L')
-            elif i ==2:
-                pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(9))
-                pdf.set_xy(px2MM(deg_two),px2MM(514+(i*52)+4)) 
-                pdf.multi_cell(px2MM(15), px2MM(12),"3",border='0',align='L')
+        deg_two = 1541+(mm2PX(pdf.get_string_width(str(val2)))/2)    
+        pdf.set_font('LeagueSpartan-Regular', size=px2pts(9))
+        if i == 1:
+            pdf.set_xy(px2MM(deg_two),px2MM(514+(i*52)+4)) 
+            pdf.multi_cell(px2MM(15), px2MM(12),"2",border='0',align='L')
+        elif i ==2:
+            pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(9))
+            pdf.set_xy(px2MM(deg_two),px2MM(514+(i*52)+4)) 
+            pdf.multi_cell(px2MM(15), px2MM(12),"3",border='0',align='L')
             
     #//*---Comments----*//
     comments = ["Estimated based on your need-based analysis, considering the identified mortality protection gap.","Estimated using your age, gender, the above cover, and coverage until the age of 65 years, for an affordable policy. The exact premium may vary depending on other factors like policy tenure, cover amount, life insurer, etc.","Net savings in premiums can be reinvested in high-quality instruments."]
@@ -7898,371 +7763,6 @@ def insurance_policy_eveluation(pdf,json_data,c_MoneyS,money_signData):
         
     #//*-----Index Text of Page--**////
     index_text(pdf,'#1A1A1D')
-        
-        
-
-
-# #//*----------------------------------**------------------------------------------------//
-# #//*-----Insurance Policy Evaluation----*//
-# def insurance_policy_recommendation_summary(pdf,json_data,c_MoneyS,money_signData):
-#     try:
-#         tab_val2 = json_data["insurance_policy_evaluation"]['recommendation_table']
-#         if tab_val2==[]:
-#             return None
-#     except:
-#         return None 
-    
-#     insurance_policy_recommendation = pd.DataFrame.from_dict(tab_val2)
-#     if insurance_policy_recommendation.empty:
-#         return None
-    
-#     plan = insurance_policy_recommendation['plan'].tolist()
-#     cover = insurance_policy_recommendation['cover'].tolist()
-#     annual_premium = insurance_policy_recommendation['annual_premium'].tolist()
-    
-#     pdf.add_page()
-#     pdf.set_fill_color(*hex2RGB('#FCF8ED'))
-#     pdf.rect(0, 0, px2MM(1920), px2MM(1080),'F')
-
-#     #//*----Featured List of Financial Products----*//
-#     pdf.set_xy(px2MM(120),px2MM(80)) 
-#     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(60))
-#     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-#     pdf.cell(px2MM(602), px2MM(84),'Insurance Policy Evaluation',align='L')
-    
-#     #//*---Top Black box
-#     pdf.set_fill_color(*hex2RGB('#000000'))
-#     pdf.rect(px2MM(0), px2MM(80), px2MM(15), px2MM(84),'F') 
-    
-#     #//*----Heading Statements----*//
-#     statement1 = "By separating your insurance and investment needs, you can increase your life coverage significantly (with term insurance) and earn better returns on your investments (with instruments like mutual funds)."
-#     statement2 = "Refer to our “Financial Products Featured List” section for high-quality term insurance and mutual fund options."
-    
-#     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(30))
-#     pdf.set_text_color(*hex2RGB('#000000'))
-#     pdf.set_xy(px2MM(120),px2MM(204)) 
-#     pdf.multi_cell(px2MM(1680), px2MM(42),statement1,align='L')
-    
-#     pdf.set_xy(px2MM(120),px2MM(308)) 
-#     pdf.multi_cell(px2MM(1680), px2MM(42),statement2,align='L')
-    
-#     pdf.rect(px2MM(120), px2MM(410), px2MM(315), px2MM(42),'F') 
-#     pdf.set_fill_color(*hex2RGB('#313236'))
-#     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-#     pdf.set_text_color(*hex2RGB('#FFFFFF'))
-#     pdf.set_xy(px2MM(135),px2MM(415)) 
-#     pdf.multi_cell(px2MM(300), px2MM(32),'Recommendation Summary',align='L')
-    
-#     pdf.set_draw_color(*hex2RGB('#E9EAEE'))
-#     pdf.set_line_width(px2MM(0.02))
-    
-#     #//*---Table Rectangles---*//
-#     for i in range(3):
-#         if i == 1:
-#             pdf.set_fill_color(*hex2RGB('#F3F6F9'))
-#         else:
-#             pdf.set_fill_color(*hex2RGB('#FFFFFF'))
-#         pdf.rect(px2MM(120), px2MM(452+(i*52)), px2MM(646), px2MM(52),'FD') 
-#         pdf.rect(px2MM(766), px2MM(452+(i*52)), px2MM(517), px2MM(52),'FD') 
-#         pdf.rect(px2MM(1283), px2MM(452+(i*52)), px2MM(517), px2MM(52),'FD')
-        
-#     #//*---For last Row (Full White)    
-#     pdf.set_fill_color(*hex2RGB('#B9BABE'))
-#     pdf.set_draw_color(*hex2RGB('#B9BABE'))
-#     pdf.set_line_width(px2MM(1))
-#     # pdf.rect(px2MM(126), px2MM(mm2PX(tot_height)+43), px2MM(1674), px2MM(1),'F') 
-#     # pdf.set_fill_color(*hex2RGB('#E9EAEE'))    
-#     pdf.rect(px2MM(120), px2MM(608), px2MM(1680), px2MM(1),'FD')
-#     pdf.set_fill_color(*hex2RGB('#FFFFFF'))   
-#     pdf.set_draw_color(*hex2RGB('#E9EAEE'))
-#     pdf.set_line_width(px2MM(0.2)) 
-#     pdf.rect(px2MM(120), px2MM(609), px2MM(1680), px2MM(52),'FD')
-        
-#     #//*---Column Names---------*//
-#     #//*---Col 1
-#     pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-#     pdf.set_text_color(*hex2RGB('#1A1A1D'))
-#     pdf.set_xy(px2MM(140),px2MM(462)) 
-#     pdf.multi_cell(px2MM(350), px2MM(32),'',align='L')
-    
-#     #//*---Col 2
-#     pdf.set_xy(px2MM(786),px2MM(462)) 
-#     pdf.multi_cell(px2MM(477), px2MM(32),'Cover',align='C')
-    
-#     #//*--col 3
-#     pdf.set_xy(px2MM(1303),px2MM(462)) 
-#     pdf.multi_cell(px2MM(477), px2MM(32),'Annual Premium',align='C')
-    
-
-#     for i in range(3):
-#         #//*---Field Values---------*//
-#         #//*---Col 1
-#         pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-#         pdf.set_text_color(*hex2RGB('#1A1A1D'))
-#         pdf.set_xy(px2MM(140),px2MM(514+(i*52))) 
-#         pdf.multi_cell(px2MM(350), px2MM(32),plan[i],align='L')
-        
-#         #//*---Col 2
-#         pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))  
-#         pdf.set_xy(px2MM(786),px2MM(514+(i*52))) 
-#         if cover[i]== "":
-#             pdf.multi_cell(px2MM(477), px2MM(32),"",align='C')
-#         else:
-#             val1 = "₹ "+str(format_cash2(float(cover[i])))
-#             pdf.multi_cell(px2MM(477), px2MM(32),val1,border='0',align='C')
-            
-#         if i == 1:
-#             deg_one = mm2PX(pdf.get_x())+3
-#             deg_one = 1024+(mm2PX(pdf.get_string_width(str(val1)))/2)
-#             pdf.set_font('LeagueSpartan-Regular', size=px2pts(9))
-#             pdf.set_xy(px2MM(deg_one),px2MM(514+(i*52)+4)) 
-#             pdf.multi_cell(px2MM(15), px2MM(12),"1",border='0',align='L')
-        
-#         #//*--col 3
-#         pdf.set_xy(px2MM(1303),px2MM(514+(i*52))) 
-#         if i == 2:
-#             pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-#             pdf.set_xy(px2MM(1303),px2MM(514+(i*52)+1)) 
-#         else:
-#             pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-#         if annual_premium[i] == "" :   
-#             pdf.multi_cell(px2MM(477), px2MM(32),' ',align='C')
-#         else:
-#             val2 = "₹ "+str(format_cash2(float(annual_premium[i])))
-#             pdf.multi_cell(px2MM(477), px2MM(32),val2,align='C')
-            
-#         deg_two = 1541+(mm2PX(pdf.get_string_width(str(val2)))/2)    
-#         pdf.set_font('LeagueSpartan-Regular', size=px2pts(9))
-#         if i == 1:
-#             pdf.set_xy(px2MM(deg_two),px2MM(514+(i*52)+4)) 
-#             pdf.multi_cell(px2MM(15), px2MM(12),"2",border='0',align='L')
-#         elif i ==2:
-#             pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(9))
-#             pdf.set_xy(px2MM(deg_two),px2MM(514+(i*52)+4)) 
-#             pdf.multi_cell(px2MM(15), px2MM(12),"3",border='0',align='L')
-            
-#     #//*---Comments----*//
-#     comments = ["Estimated based on your need-based analysis, considering the identified mortality protection gap.","Estimated using your age, gender, the above cover, and coverage until the age of 65 years, for an affordable policy. The exact premium may vary depending on other factors like policy tenure, cover amount, life insurer, etc.","Net savings in premiums can be reinvested in high-quality instruments."]
-#     comm_num = [1,2,3]
-#     for i in range(3) :
-#         pdf.set_font('LeagueSpartan-Light', size=px2pts(8))
-#         pdf.set_xy(px2MM(120),px2MM(697+(i*25)+10)) 
-#         pdf.multi_cell(px2MM(15), px2MM(25),str(comm_num[i]),align='L')
-        
-#         pdf.set_font('LeagueSpartan-Light', size=px2pts(18))
-#         pdf.set_xy(px2MM(127),px2MM(700+(i*25)+10)) 
-#         pdf.multi_cell(px2MM(1680), px2MM(25),comments[i],align='L')
-        
-#     #//*-----Index Text of Page--**////
-#     index_text(pdf,'#1A1A1D')
-
-
-#//*-----CreditCard Evaluation----*//
-def credit_card_evaluation(pdf,json_data,c_MoneyS,money_signData):
-    try:
-        tab_val1 = json_data["creditcard_evaluation"]
-        if tab_val1==[]:
-            return None
-    except:
-        return None 
-    
-    for data in tab_val1:
-        pdf.add_page()
-        pdf.set_fill_color(*hex2RGB('#FCF8ED'))
-        pdf.rect(0, 0, px2MM(1920), px2MM(1080),'F')
-
-        #//*----'Credit Card Evaluation'----*//
-        pdf.set_xy(px2MM(120),px2MM(80)) 
-        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(60))
-        pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        pdf.cell(px2MM(602), px2MM(84),'Credit Card Evaluation',align='L')
-        
-        #//*---Top Black box
-        pdf.set_fill_color(*hex2RGB('#000000'))
-        pdf.rect(px2MM(0), px2MM(80), px2MM(15), px2MM(84),'F')
-        
-        #//*----Main Big rect---*//
-        pdf.set_draw_color(*hex2RGB('#E9EAEE'))
-        pdf.set_line_width(px2MM(0.2))
-        pdf.set_fill_color(*hex2RGB('#FCF8ED'))
-        pdf.rect(px2MM(120), px2MM(203.7), px2MM(1680.3), px2MM(732.5),'FD')
-        
-        #//*----Dark Grey Rectangular Box (TOP Left BOX 1)----*///
-        
-        pdf.set_fill_color(*hex2RGB('#313236'))
-        pdf.rect(px2MM(120), px2MM(204), px2MM(600), px2MM(454),'F')
-        
-        #//*--Card Name----*//
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-        pdf.set_text_color(*hex2RGB('#FFFFFF'))
-        pdf.set_xy(px2MM(150),px2MM(234)) 
-        pdf.cell(px2MM(540), px2MM(42),data['name'],align='L')
-        
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#898B90'))
-        pdf.set_xy(px2MM(150),px2MM(300)) 
-        pdf.cell(px2MM(540), px2MM(32),"Annual fee",align='L')
-        
-        pdf.set_font('LeagueSpartan-Medium', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#FFFFFF'))
-        pdf.set_xy(px2MM(150),px2MM(340)) 
-        pdf.multi_cell(px2MM(540), px2MM(32),data['annual_fee'],align='L')
-        
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#898B90'))
-        pdf.set_xy(px2MM(150),px2MM(396)) 
-        pdf.cell(px2MM(540), px2MM(32),"Best suited for",align='L')
-        
-        pdf.set_font('LeagueSpartan-Medium', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#FFFFFF'))
-        pdf.set_xy(px2MM(150),px2MM(436)) 
-        pdf.multi_cell(px2MM(540), px2MM(32),data['best_suited_for'],align='L')
-        
-        rem = mm2PX(pdf.get_y())+24
-        
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#898B90'))
-        pdf.set_xy(px2MM(150),px2MM(rem)) 
-        pdf.cell(px2MM(540), px2MM(32),"Rewards convertibility",align='L')
-        
-        pdf.set_font('LeagueSpartan-Medium', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#FFFFFF'))
-        pdf.set_xy(px2MM(150),px2MM(rem+40)) 
-        pdf.multi_cell(px2MM(540), px2MM(32),data['reward_convertibility'],align='L')
-        
-        
-        #//*----Light Grey Rectangular Box (Bottom Left BOX 2)----*///
-        pdf.set_fill_color(*hex2RGB('#B9BABE'))
-        pdf.rect(px2MM(120), px2MM(662), px2MM(600), px2MM(274),'F')
-        
-        pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-        pdf.set_text_color(*hex2RGB('#000000'))
-        pdf.set_xy(px2MM(150),px2MM(692)) 
-        pdf.cell(px2MM(540), px2MM(32),"Rewards Points Redemption",align='L')
-        
-        line_x = 150
-        line_y = (780,829.35,780,829.35)
-        
-        for i in range(4):
-            pdf.set_fill_color(*hex2RGB('#898B90'))
-            pdf.rect(px2MM(line_x), px2MM(line_y[i]), px2MM(258), px2MM(1),'F')
-            if i == 1:
-               line_x = 432 
-        
-        type_x = 145  
-        val_x = 334  
-        type_y = (743,793,842,743,793,842)       
-        val_y = (740,789.5,839,740,789.5,839)       
-        type_name = ("Flights","Vouchers","Product Purchase / Shopping","Cashback","Air Miles","Hotels") 
-        type_val = ("flights","vouchers","product_purchases","cashback","air_miles","hotels")
-              
-        for i in range(6):
-            
-            pdf.set_font('LeagueSpartan-Regular', size=px2pts(20))
-            pdf.set_text_color(*hex2RGB('#4B4C51'))
-            pdf.set_xy(px2MM(type_x),px2MM(type_y[i])) 
-            pdf.multi_cell(px2MM(180), px2MM(28),type_name[i],align='L')
-                        
-            pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-            pdf.set_text_color(*hex2RGB('#000000'))
-            pdf.set_xy(px2MM(val_x),px2MM(val_y[i])) 
-            if type_name[i] == "Air Miles": 
-                pdf.multi_cell(px2MM(80), px2MM(32),data['reward_point_redemption'][type_val[i]],align='R')
-            else:
-                pdf.multi_cell(px2MM(80), px2MM(32),'₹ '+data['reward_point_redemption'][type_val[i]],align='R')
-            
-            if i == 2:
-               type_x = 428
-               val_x = 616
-               
-        
-        #//*----White Rectangular Box (Right BOX 3)----*///
-        pdf.set_fill_color(*hex2RGB('#FFFFFF'))
-        pdf.rect(px2MM(720), px2MM(204), px2MM(1080), px2MM(732),'F') 
-        
-        #//*---Category--//
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-        pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        pdf.set_xy(px2MM(750),px2MM(234)) 
-        pdf.multi_cell(px2MM(1080), px2MM(42),'Category',align='L')
-        
-        text_y = mm2PX(pdf.get_y())+16
-        
-        for i in range(len(data['category'])):
-            
-            #//**---Description---(first printed desc to get the desc height)
-            pdf.set_font('LeagueSpartan-Light', size=px2pts(20))
-            pdf.set_text_color(*hex2RGB('#313236'))
-            pdf.set_xy(px2MM(1002),px2MM(text_y)) 
-            pdf.multi_cell(px2MM(768), px2MM(28),data['category'][i]['description'],align='L')
-            
-            rem = mm2PX(pdf.get_y())
-            
-            #//*----Name---*//
-            pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-            pdf.set_text_color(*hex2RGB('#313236'))
-            pdf.set_xy(px2MM(750),px2MM(text_y)) 
-            pdf.multi_cell(px2MM(180), px2MM(rem-text_y),str(data['category'][i]['name']),align='L')
-            
-            #//*----God or Bad---*//
-            if data['category'][i]['type'] == 'good':
-                pdf.image(join(cwd,'assets', 'images','credit_card','Thumbsup.png'),px2MM(954), px2MM(text_y+((rem-text_y)/2)-12), px2MM(24), px2MM(24))
-            elif data['category'][i]['type'] == 'bad':
-                pdf.image(join(cwd,'assets', 'images','credit_card','Thumbsdown.png'),px2MM(954), px2MM(text_y+((rem-text_y)/2)-12), px2MM(24), px2MM(24))
-            else:
-                pdf.set_xy(px2MM(954), px2MM(text_y)) 
-                pdf.multi_cell(px2MM(24), px2MM(24),'-',align='L')
-            
-            text_y = rem+16
-            
-        #//*---Complimentary Airport Lounge Access --//
-        
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(30))
-        pdf.set_text_color(*hex2RGB('#1A1A1D'))
-        pdf.set_xy(px2MM(750),px2MM(text_y+44)) 
-        pdf.multi_cell(px2MM(480), px2MM(42),'Complimentary Airport Lounge Access ',align='L')
-        
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(20))
-        pdf.set_text_color(*hex2RGB('#65676D'))
-        pdf.set_xy(px2MM(1228),px2MM(text_y+53)) 
-        pdf.multi_cell(px2MM(480), px2MM(28),'(Per year at participating lounges)',align='L')
-        
-        text_y = mm2PX(pdf.get_y())+21
-        
-        for i in range(len(data['complimentary_airport_lounge_acess'])):
-            pdf.set_font('LeagueSpartan-Light', size=px2pts(20))
-            pdf.set_text_color(*hex2RGB('#313236'))
-            pdf.set_xy(px2MM(1002),px2MM(text_y)) 
-            pdf.multi_cell(px2MM(768), px2MM(28),data['complimentary_airport_lounge_acess'][i]['description'],align='L')
-            
-            rem = mm2PX(pdf.get_y())
-            
-            pdf.set_font('LeagueSpartan-SemiBold', size=px2pts(24))
-            pdf.set_text_color(*hex2RGB('#313236'))
-            pdf.set_xy(px2MM(750),px2MM(text_y)) 
-            pdf.multi_cell(px2MM(180), px2MM(rem-text_y),str(data['complimentary_airport_lounge_acess'][i]['name']),align='L')
-            
-            #//*----God or Bad---*//
-            if data['complimentary_airport_lounge_acess'][i]['type'] == 'good':
-                pdf.image(join(cwd,'assets', 'images','credit_card','Thumbsup.png'),px2MM(954), px2MM(text_y+((rem-text_y)/2)-12), px2MM(24), px2MM(24))
-            elif data['complimentary_airport_lounge_acess'][i]['type'] == 'bad':
-                pdf.image(join(cwd,'assets', 'images','credit_card','Thumbsdown.png'),px2MM(954), px2MM(text_y+((rem-text_y)/2)-12), px2MM(24), px2MM(24))
-            else:
-                pdf.set_xy(px2MM(954), px2MM(text_y)) 
-                pdf.multi_cell(px2MM(24), px2MM(24),'-',align='L')
-            
-            text_y = rem+16
-
-
-        #  desclaimer = "Disclaimer: All the above schemes are Growth-Direct plans. The above featured list is based on 1 Finance's proprietary research. "
-        pdf.set_text_color(*hex2RGB('#000000'))
-        pdf.set_font('LeagueSpartan-Regular', size=px2pts(24))
-        pdf.set_xy(px2MM(120),px2MM(1008))  
-        desclaimer = "Disclaimer: Evaluation for each category is done by comparing card features with other cards in similar annual fees range."    
-        pdf.multi_cell(px2MM(1680), px2MM(32),desclaimer,align='C')
-        
-        #//*-----Index Text of Page--**////
-        index_text(pdf,'#1A1A1D')
         
               
 #//*-----Planning Your Estate and Will
@@ -8595,7 +8095,7 @@ def fin_profile(pdf, json_data,c_MoneyS,money_signData):
         
         #//*--To print superscritp R 
         pdf.set_xy(px2MM(1046), px2MM(252))
-        pdf.set_font('Inter-Light', size=26)
+        pdf.set_font('Inter-ExtraLight', size=26)
         pdf.set_text_color(*hex2RGB('#000000'))
         pdf.cell(px2MM(16), px2MM(56), '®') 
 
@@ -8722,7 +8222,6 @@ def fin_profile(pdf, json_data,c_MoneyS,money_signData):
     index_text(pdf,'#FFFFFF')
     global your_fin_prof_idx
     your_fin_prof_idx = pdf.page_no()
-
 #//*----Our Assumptions------*//
 def assumptions(pdf,json_data,c_MoneyS,money_signData):
     try:
@@ -9049,6 +8548,7 @@ def fin_wellness_plan(pdf,json_data,c_MoneyS,money_signData):
     your_fw_plan_idx = pdf.page_no()
     
     
+
 #//*------cashflow_plan
 def cashflow_plan(pdf,json_data,c_MoneyS,money_signData):
     try:
@@ -9533,6 +9033,5 @@ def your_1_view_detail(pdf,json_data,c_MoneyS,money_signData):
      
         
 
-# #//*----Calling of main functiong by taking sys.argv----*//
-# excel_file,save_path = sys.argv[1],sys.argv[2]
-# api_call(excel_file,save_path)
+#//*----Calling of main functiong by taking sys.argv----*//
+
